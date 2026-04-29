@@ -1,0 +1,1452 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hermnet — Mensajería <span class="term" data-label="Zero-Knowledge" data-tip="El servidor aprende cero información sobre el contenido. Matemáticamente, aunque lo quisiese, es incapaz de descifrar lo que transmite.">Zero-Knowledge</span></title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #06080d;
+  --surface: #0b0e17;
+  --surface2: #0f1320;
+  --border: rgba(255,255,255,0.055);
+  --accent: #3b82f6;
+  --accent2: #06b6d4;
+  --accent-dim: rgba(59,130,246,0.12);
+  --accent-glow: rgba(59,130,246,0.3);
+  --steel: #7a93b0;
+  --text: #e8edf5;
+  --muted: #3d4f65;
+  --font-display: 'Bricolage Grotesque', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  line-height: 1.65;
+}
+
+/* ── CANVAS ── */
+#bg-canvas {
+  position: fixed; inset: 0;
+  width: 100%; height: 100%;
+  pointer-events: none; z-index: 0;
+}
+/* ── SIMPLE GLOW BG ── */
+.bg-glow {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 80vw 60vh at 28% 18%, rgba(59,130,246,.06) 0%, transparent 65%),
+    radial-gradient(ellipse 55vw 45vh at 72% 78%, rgba(6,182,212,.04) 0%, transparent 65%);
+  animation: glowDrift 20s ease-in-out infinite alternate;
+}
+@keyframes glowDrift {
+  from { transform: scale(1) translate(0,0); }
+  to   { transform: scale(1.1) translate(3%, 2%); }
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 6vw; height: 68px;
+  transition: background .5s, border-color .5s;
+  border-bottom: 1px solid transparent;
+}
+nav.scrolled {
+  background: rgba(6,8,13,.88);
+  backdrop-filter: blur(20px);
+  border-color: var(--border);
+}
+.nav-logo { display: flex; align-items: center; gap: 11px; }
+.nav-logo img { height: 30px; }
+.nav-logo span {
+  font-family: var(--font-display);
+  font-size: .9rem; font-weight: 700;
+  letter-spacing: .15em; color: var(--text);
+}
+.nav-links { display: flex; gap: 2.2rem; }
+.nav-links a {
+  color: var(--muted); font-size: .82rem; font-weight: 500;
+  text-decoration: none; letter-spacing: .04em;
+  transition: color .2s;
+}
+.nav-links a:hover { color: var(--text); }
+.nav-cta {
+  background: var(--accent); color: #fff;
+  border: none; padding: .45rem 1.3rem;
+  border-radius: 7px; font-family: var(--font-body);
+  font-size: .8rem; font-weight: 600; cursor: pointer;
+  transition: opacity .2s, box-shadow .2s;
+  box-shadow: 0 0 18px var(--accent-glow);
+}
+.nav-cta:hover { opacity: .85; }
+
+/* ── SECTIONS BASE ── */
+section { position: relative; z-index: 1; }
+
+/* ── HERO ── */
+#hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center;
+  padding: 120px 6vw 80px;
+  perspective: 800px;
+}
+
+.hero-logo-wrap {
+  position: relative; margin-bottom: 2.8rem;
+  will-change: transform, opacity;
+}
+.hero-logo-wrap img {
+  width: min(420px, 58vw);
+  filter: drop-shadow(0 0 80px rgba(59,130,246,.6))
+          drop-shadow(0 0 160px rgba(6,182,212,.3));
+  animation: floatLogo 6s ease-in-out infinite;
+}
+@keyframes floatLogo {
+  0%,100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-10px) scale(1.02); }
+}
+.hero-ring {
+  position: absolute; inset: -55px;
+  border-radius: 50%;
+  border: 1px solid rgba(59,130,246,.1);
+  animation: ringPulse 4s ease-in-out infinite;
+}
+.hero-ring-2 {
+  position: absolute; inset: -110px;
+  border-radius: 50%;
+  border: 1px solid rgba(59,130,246,.05);
+  animation: ringPulse 4s ease-in-out infinite .9s;
+}
+@keyframes ringPulse {
+  0%,100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.04); opacity: .5; }
+}
+
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(59,130,246,.1); border: 1px solid rgba(59,130,246,.25);
+  color: var(--accent); font-size: .72rem; font-weight: 600;
+  letter-spacing: .12em; padding: .35rem 1rem;
+  border-radius: 999px; margin-bottom: 2rem;
+  text-transform: uppercase; font-family: var(--font-body);
+}
+.hero-badge .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent); animation: pulse 2s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.3;transform:scale(.6)} }
+
+h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 7vw, 5.8rem);
+  font-weight: 800; line-height: 1.04;
+  letter-spacing: -.035em;
+  max-width: 860px;
+  text-wrap: balance;
+  margin-top: 2.6rem;
+}
+h1 em { font-style: normal; color: var(--accent); }
+
+.hero-sub {
+  margin-top: 1.4rem;
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  color: var(--steel); max-width: 500px;
+  text-wrap: balance; line-height: 1.75; font-weight: 300;
+  letter-spacing: .01em;
+}
+
+.hero-ctas { display: flex; gap: 1rem; margin-top: 2.8rem; flex-wrap: wrap; justify-content: center; }
+.btn-primary {
+  background: var(--accent); color: #fff;
+  padding: .85rem 2.1rem; border-radius: 9px;
+  font-family: var(--font-body); font-weight: 600; font-size: .92rem;
+  border: none; cursor: pointer;
+  box-shadow: 0 0 30px var(--accent-glow);
+  transition: transform .25s, box-shadow .25s;
+}
+.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 4px 40px var(--accent-glow); }
+.btn-ghost {
+  background: transparent; color: var(--steel);
+  padding: .85rem 2.1rem; border-radius: 9px;
+  font-family: var(--font-body); font-weight: 500; font-size: .92rem;
+  border: 1px solid var(--border); cursor: pointer;
+  transition: color .2s, border-color .2s, transform .25s;
+}
+.btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,.18); transform: translateY(-3px); }
+
+.hero-scroll-hint {
+  margin-top: 5rem; color: var(--muted); font-size: .7rem;
+  letter-spacing: .14em; display: flex; flex-direction: column; align-items: center; gap: 10px;
+  animation: scrollBounce 2.8s ease-in-out infinite;
+  font-family: var(--font-body);
+}
+@keyframes scrollBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(8px)} }
+.scroll-chevron { display: flex; flex-direction: column; gap: 4px; }
+.scroll-chevron span {
+  display: block; width: 12px; height: 12px;
+  border-right: 1.5px solid var(--muted);
+  border-bottom: 1.5px solid var(--muted);
+  transform: rotate(45deg);
+}
+.scroll-chevron span:nth-child(2) { opacity: .5; margin-top: -6px; }
+
+/* ── CINEMATIC WRAPPERS ── */
+.cin-section {
+  will-change: transform, opacity;
+}
+
+/* ── SECTION CHROME ── */
+.section-label {
+  font-size: .68rem; font-weight: 700; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--accent);
+  margin-bottom: .8rem; font-family: var(--font-body);
+}
+h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  font-weight: 800; letter-spacing: -.025em; line-height: 1.1;
+  text-wrap: balance;
+}
+h2 em { font-style: normal; color: var(--accent); }
+.section-desc {
+  color: var(--steel); font-size: .96rem; max-width: 500px;
+  line-height: 1.8; margin-top: .9rem;
+}
+
+/* ── HOW SECTION ── */
+#how { padding: 110px 0; overflow: hidden; }
+.how-header { padding: 0 6vw; margin-bottom: 3.5rem; }
+
+.how-track {
+  display: flex; gap: 1.5rem;
+  padding: 1rem 6vw 2rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; cursor: grab;
+}
+@media(min-width:1100px) {
+  .how-track {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    overflow-x: visible;
+    cursor: default;
+    scroll-snap-type: none;
+  }
+  .step-card { flex: unset; }
+  #how-nav { display: none; }
+}
+.how-track::-webkit-scrollbar { display: none; }
+.how-track.grabbing { cursor: grabbing; }
+
+.step-card {
+  flex: 0 0 min(340px, 78vw);
+  scroll-snap-align: start;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px; padding: 2.2rem;
+  transition: border-color .3s, transform .35s;
+}
+.step-card:hover { border-color: rgba(59,130,246,.28); transform: translateY(-5px); }
+.step-num {
+  font-family: var(--font-display);
+  font-size: 3.8rem; font-weight: 800; line-height: 1;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, var(--accent) 0%, rgba(59,130,246,.1) 60%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.step-icon {
+  width: 48px; height: 48px; background: var(--accent-dim);
+  border-radius: 13px; display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; margin-bottom: 1.2rem;
+}
+.step-card h3 { font-family: var(--font-display); font-size: 1.05rem; font-weight: 700; margin-bottom: .6rem; }
+.step-card p { color: var(--steel); font-size: .85rem; line-height: 1.75; }
+.step-tag {
+  display: inline-block; margin-top: 1rem;
+  font-size: .62rem; color: var(--accent);
+  background: var(--accent-dim); padding: .22rem .6rem; border-radius: 5px;
+  letter-spacing: .07em; font-family: monospace;
+}
+
+.how-nav { display: flex; align-items: center; gap: .8rem; padding: 0 6vw; margin-top: 1.5rem; }
+.how-btn {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--steel); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color .2s, color .2s, transform .2s;
+}
+.how-btn:hover { border-color: var(--accent); color: var(--accent); transform: scale(1.1); }
+.how-dots { display: flex; gap: 6px; }
+.how-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); transition: all .3s; }
+.how-dot.active { background: var(--accent); width: 22px; border-radius: 3px; }
+
+/* ── FEATURES ── */
+#features { padding: 110px 6vw; }
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem; margin-top: 3.5rem;
+}
+.feat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 18px; padding: 1.9rem;
+  transition: border-color .3s, transform .35s;
+  position: relative; overflow: hidden;
+}
+.feat-card::after {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0; transition: opacity .3s;
+}
+.feat-card:hover { border-color: rgba(59,130,246,.25); transform: translateY(-4px); }
+.feat-card:hover::after { opacity: 1; }
+.feat-icon {
+  width: 46px; height: 46px; background: var(--accent-dim);
+  border-radius: 12px; display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; margin-bottom: 1.3rem;
+}
+.feat-card h3 { font-family: var(--font-display); font-size: .95rem; font-weight: 700; margin-bottom: .5rem; }
+.feat-card p { color: var(--steel); font-size: .82rem; line-height: 1.75; }
+.feat-mono { font-size: .63rem; color: var(--muted); margin-top: .8rem; letter-spacing: .04em; font-family: monospace; }
+
+/* ── STEGO ── */
+#stego {
+  padding: 110px 6vw;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.stego-inner {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 5rem; align-items: center;
+  max-width: 1100px; margin: 0 auto;
+}
+@media(max-width:768px) {
+  .stego-inner { grid-template-columns: 1fr; gap: 3rem; }
+  nav .nav-links { display: none; }
+}
+.pixel-grid { display: grid; grid-template-columns: repeat(10,1fr); gap: 3px; border-radius: 14px; overflow: hidden; }
+.pixel { aspect-ratio: 1; border-radius: 3px; transition: background .5s; }
+.stego-label { text-align: center; font-size: .65rem; color: var(--muted); letter-spacing: .12em; margin-top: .75rem; font-family: monospace; }
+.bit-stream {
+  font-family: monospace; font-size: .68rem; color: var(--muted);
+  line-height: 1.9; word-break: break-all; margin-top: 1.5rem;
+  background: var(--surface2); padding: 1rem; border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.bit-stream .b1 { color: var(--accent); }
+.stego-steps { margin-top: 2rem; display: flex; flex-direction: column; gap: 1.1rem; }
+.stego-step { display: flex; gap: 1rem; align-items: flex-start; }
+.stego-step-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--accent-dim); border: 1px solid rgba(59,130,246,.3);
+  color: var(--accent); font-size: .72rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-family: monospace;
+}
+.stego-step p { color: var(--steel); font-size: .84rem; line-height: 1.65; }
+.stego-step p strong { color: var(--text); font-weight: 600; }
+
+/* ── AUDIENCE ── */
+#audience { padding: 110px 6vw; }
+.audience-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem; margin-top: 3.5rem;
+}
+.aud-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 18px; padding: 2.2rem 1.6rem;
+  text-align: center;
+  transition: border-color .3s, transform .35s;
+}
+.aud-card:hover { border-color: rgba(59,130,246,.28); transform: translateY(-5px); }
+.aud-icon { font-size: 2.4rem; margin-bottom: 1.1rem; }
+.aud-card h3 { font-family: var(--font-display); font-size: 1rem; font-weight: 700; margin-bottom: .5rem; }
+.aud-card p { color: var(--steel); font-size: .82rem; line-height: 1.65; }
+
+/* ── CTA ── */
+#cta {
+  padding: 140px 6vw; text-align: center;
+  position: relative; overflow: hidden;
+}
+#cta::before {
+  content: ''; position: absolute;
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(59,130,246,.07) 0%, transparent 65%);
+  pointer-events: none;
+}
+#cta h2 { max-width: 680px; margin: 0 auto; }
+#cta p { color: var(--steel); margin: 1.6rem auto; max-width: 480px; font-size: .98rem; line-height: 1.8; }
+.cta-tags { display: flex; gap: .7rem; justify-content: center; flex-wrap: wrap; margin-top: 2.5rem; }
+.cta-tag {
+  font-size: .68rem; color: var(--muted);
+  background: var(--surface); border: 1px solid var(--border);
+  padding: .3rem .85rem; border-radius: 999px;
+  letter-spacing: .06em; font-family: monospace;
+}
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 2.5rem 6vw;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 1rem;
+}
+.footer-logo { display: flex; align-items: center; gap: 8px; }
+.footer-logo img { height: 22px; opacity: .6; }
+.footer-logo span {
+  font-family: var(--font-display);
+  font-size: .78rem; font-weight: 700; letter-spacing: .12em; color: var(--muted);
+}
+footer p { font-size: .73rem; color: var(--muted); }
+
+/* ── PHONE FRAMES ── */
+.phone-frame {
+  position: relative;
+  width: 160px;
+  height: 300px;
+  background: #0a0c14;
+  border-radius: 28px;
+  border: 1.5px solid rgba(255,255,255,.1);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.5),
+    0 24px 60px rgba(0,0,0,.6),
+    inset 0 0 0 1px rgba(255,255,255,.04);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform .35s cubic-bezier(.16,1,.3,1), box-shadow .35s;
+}
+.phone-frame:hover {
+  transform: translateY(-10px) scale(1.03);
+  box-shadow: 0 0 0 1px rgba(59,130,246,.2), 0 40px 80px rgba(0,0,0,.7), inset 0 0 0 1px rgba(255,255,255,.06);
+}
+.phone-tall { height: 360px; }
+.phone-tallest { height: 420px; }
+.phone-notch {
+  width: 60px; height: 14px;
+  background: #0a0c14;
+  border-radius: 0 0 12px 12px;
+  margin: 0 auto;
+  border-bottom: 1.5px solid rgba(255,255,255,.07);
+  flex-shrink: 0; z-index: 2;
+}
+.phone-screen {
+  flex: 1; overflow: hidden;
+  background: #06080d;
+  display: flex; flex-direction: column;
+}
+.phone-label {
+  position: absolute; bottom: -2rem; left: 0; right: 0;
+  text-align: center;
+  font-size: .7rem; color: var(--muted);
+  letter-spacing: .06em;
+  font-family: var(--font-body);
+}
+
+.cin {
+  opacity: 0;
+  transform: translateY(36px) scale(.97);
+  transition: opacity .85s cubic-bezier(.16,1,.3,1),
+              transform .85s cubic-bezier(.16,1,.3,1);
+}
+.cin.in { opacity: 1; transform: none; }
+.cin-d1 { transition-delay: .1s; }
+.cin-d2 { transition-delay: .2s; }
+.cin-d3 { transition-delay: .32s; }
+.cin-d4 { transition-delay: .44s; }
+
+/* ── TERM TOOLTIPS ── */
+.term {
+  border-bottom: 1.5px dashed rgba(59,130,246,.45);
+  cursor: help;
+  color: inherit;
+  transition: border-color .2s;
+}
+.term:hover { border-color: var(--accent); }
+.term-tooltip {
+  position: fixed;
+  background: #0c0f1c;
+  border: 1px solid rgba(59,130,246,.3);
+  border-radius: 12px;
+  padding: .85rem 1.1rem;
+  max-width: 270px;
+  font-size: .78rem;
+  color: var(--text);
+  line-height: 1.65;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: 0 12px 40px rgba(0,0,0,.6), 0 0 0 1px rgba(59,130,246,.08);
+  font-family: var(--font-body);
+  transition: opacity .12s;
+}
+.term-tooltip.visible { opacity: 1; }
+.tip-label {
+  font-family: var(--font-display);
+  font-weight: 700; font-size: .82rem;
+  color: var(--accent); margin-bottom: .35rem;
+  display: block;
+}
+.tip-cursor {
+  display: inline-block; width: 2px; height: .85em;
+  background: var(--accent); margin-left: 1px;
+  vertical-align: text-bottom;
+  animation: tipBlink .65s steps(1) infinite;
+}
+@keyframes tipBlink { 0%,49%{opacity:1} 50%,100%{opacity:0} }
+
+.ods-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem; margin-top: 3.5rem;
+}
+.ods-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 18px; padding: 1.75rem;
+  transition: border-color .3s, transform .35s;
+  position: relative; overflow: hidden;
+}
+.ods-card:hover { transform: translateY(-4px); }
+.ods-num {
+  font-family: var(--font-display); font-size: 2.4rem; font-weight: 800;
+  line-height: 1; margin-bottom: .75rem;
+}
+.ods-card h3 { font-family: var(--font-display); font-size: .95rem; font-weight: 700; margin-bottom: .5rem; }
+.ods-card p { color: var(--steel); font-size: .8rem; line-height: 1.7; }
+.ods-tag {
+  display: inline-block; margin-top: .75rem;
+  font-size: .62rem; padding: .22rem .6rem; border-radius: 5px;
+  letter-spacing: .07em; font-family: monospace;
+}
+.iro-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem; margin-top: 3.5rem;
+}
+.iro-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 18px; padding: 1.75rem;
+  transition: border-color .3s, transform .35s;
+}
+.iro-card:hover { transform: translateY(-4px); }
+.iro-type {
+  font-size: .6rem; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; font-family: monospace;
+  margin-bottom: .75rem;
+}
+.iro-score {
+  font-family: var(--font-display); font-size: 2rem; font-weight: 800;
+  line-height: 1; margin-bottom: .6rem;
+}
+.iro-card h3 { font-family: var(--font-display); font-size: .9rem; font-weight: 700; margin-bottom: .5rem; }
+.iro-card p { color: var(--steel); font-size: .8rem; line-height: 1.7; }
+.iro-badge {
+  display: inline-block; margin-top: .75rem;
+  font-size: .6rem; padding: .22rem .6rem; border-radius: 5px;
+  letter-spacing: .07em; font-family: monospace; font-weight: 700;
+}
+.stats-row {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1.5rem; margin-top: 3.5rem;
+}
+.stat-block {
+  text-align: center; padding: 2rem 1rem;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 18px;
+  transition: border-color .3s, transform .35s;
+}
+.stat-block:hover { border-color: rgba(59,130,246,.25); transform: translateY(-4px); }
+.stat-num {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  font-weight: 800; color: var(--accent); line-height: 1;
+  margin-bottom: .5rem;
+}
+.stat-label { color: var(--steel); font-size: .8rem; line-height: 1.6; }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas" style="display:none"></canvas>
+<div class="bg-glow"></div>
+
+<nav id="main-nav">
+  <div class="nav-logo">
+    <img src="assets/logo-new.png" alt="Hermnet" />
+    <span>HERMNET</span>
+  </div>
+  <div class="nav-links">
+    <a href="#how">Cómo funciona</a>
+    <a href="#features">Seguridad</a>
+    <a href="#stego">Tecnología</a>
+    <a href="#greenIT">Green IT</a>
+    <a href="#ods">ODS</a>
+    <a href="#iros">IROs</a>
+  </div>
+  <button class="nav-cta" onclick="window.open('https://github.com/Hermnet/Hermnet','_blank')">GitHub →</button>
+</nav>
+
+<!-- ═══ HERO ═══ -->
+<section id="hero">
+  <div class="hero-logo-wrap cin cin-d1">
+    <div class="hero-ring"></div>
+    <div class="hero-ring-2"></div>
+    <img src="assets/logo-new.png" alt="Hermnet" />
+  </div>
+
+  <p class="cin cin-d2" style="font-family:var(--font-display);font-size:clamp(.75rem,1.2vw,.9rem);font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem">Solo para Android</p>
+  <h1 class="cin cin-d2">Privacidad absoluta.<br/><em>Sin compromisos.</em></h1>
+  <p class="hero-sub cin cin-d3" style="margin-top:1.8rem">Sin teléfono. Sin email. Sin contraseñas. Tus mensajes viajan cifrados de extremo a extremo — el servidor solo ve datos opacos que no puede descifrar.</p>
+
+  <div class="hero-ctas cin cin-d4">
+    <button class="btn-primary" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">Descargar para Android</button>
+    <button class="btn-ghost" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">Ver cómo funciona</button>
+  </div>
+
+  <div class="hero-scroll-hint">
+    <span>SCROLL</span>
+    <div class="scroll-chevron"><span></span><span></span></div>
+  </div>
+</section>
+
+<!-- ═══ HOW IT WORKS ═══ -->
+<section id="how">
+  <div class="how-header">
+    <div class="section-label cin">El flujo</div>
+    <h2 class="cin cin-d1">Funciona así.</h2>
+    <p class="section-desc cin cin-d2">Cinco pasos. Ninguno revela quién eres, qué dices, ni con quién hablas.</p>
+  </div>
+  <div class="how-track" id="how-track">
+    <div class="step-card">
+      <div class="step-num">01</div>
+      <div class="step-icon">🔑</div>
+      <h3>Tu Pasaporte Digital</h3>
+      <p>Tu móvil genera un par de claves <span class="term" data-label="Ed25519" data-tip="Algoritmo de firma digital ultrarrápido basado en curvas elípticas. Genera identidades criptográficas compactas y muy seguras.">Ed25519</span> localmente. La clave privada nunca sale del dispositivo. Ningún servidor la ve jamás.</p>
+      <span class="step-tag">Ed25519 · <span class="term" data-label="SecureStore" data-tip="Almacén cifrado del sistema operativo móvil (Android Keystore / iOS Secure Enclave). Guarda claves privadas protegidas por hardware, inaccesibles incluso si extraes el almacenamiento.">SecureStore</span></span>
+    </div>
+    <div class="step-card">
+      <div class="step-num">02</div>
+      <div class="step-icon">📲</div>
+      <h3>El Saludo Secreto</h3>
+      <p>Añades contactos escaneando su QR. Vuestros teléfonos intercambian claves públicas directamente. Ningún servidor registra la relación.</p>
+      <span class="step-tag">TOFU · QR · X25519</span>
+    </div>
+    <div class="step-card">
+      <div class="step-num">03</div>
+      <div class="step-icon">🔒</div>
+      <h3>El Sobre Sellado</h3>
+      <p>El mensaje se cifra con <span class="term" data-label="AES-256-GCM" data-tip="El estándar de cifrado simétrico más robusto del mundo. Usa una clave de 256 bits — probar todas las combinaciones llevaría más tiempo que la edad del universo.">AES-256-GCM</span>. La clave de sesión se envuelve con <span class="term" data-label="RSA-2048 OAEP" data-tip="Algoritmo de cifrado asimétrico. Tu clave pública cifra, solo tu clave privada descifra. El "2048" son los bits de seguridad; OAEP es el esquema de relleno que lo hace seguro."><span class="term" data-label="RSA-2048" data-tip="Sistema criptográfico basado en la dificultad matemática de factorizar números enormes. Con 2048 bits, romperlo tomaría millones de años con hardware actual.">RSA-2048</span> OAEP</span> del destinatario. El servidor recibe un blob binario opaco que no puede abrir.</p>
+      <span class="step-tag">AES-256-GCM · RSA-2048 OAEP</span>
+    </div>
+    <div class="step-card">
+      <div class="step-num">04</div>
+      <div class="step-icon">🔔</div>
+      <h3>La Alarma Silenciosa</h3>
+      <p>Recibes una notificación vacía. Tu app descarga el <span class="term" data-label="Payload" data-tip="El contenido cifrado que viaja por la red. En Hermnet, es un blob binario opaco: el servidor no puede saber qué hay dentro.">payload</span> cifrado, lo descifra localmente con tu clave privada RSA. Google y Apple nunca ven el contenido.</p>
+      <span class="step-tag">Blind Push · FCM · RSA-SHA256</span>
+    </div>
+    <div class="step-card">
+      <div class="step-num">05</div>
+      <div class="step-icon">🔒</div>
+      <h3>La Caja Fuerte</h3>
+      <p>Tu historial vive en <span class="term" data-label="SQLite" data-tip="Base de datos ligera que vive directamente en tu dispositivo. En Hermnet, todos tus mensajes se guardan aquí, cifrados, sin pasar por ningún servidor.">SQLite</span> cifrada solo en tu dispositivo. Un archivo .hnet protegido te permite recuperar todo en un móvil nuevo.</p>
+      <span class="step-tag">SQLite · .hnet · AES-GCM</span>
+    </div>
+  </div>
+  <div class="how-nav">
+    <button class="how-btn" id="how-prev">←</button>
+    <button class="how-btn" id="how-next">→</button>
+    <div class="how-dots" id="how-dots">
+      <div class="how-dot active"></div>
+      <div class="how-dot"></div>
+      <div class="how-dot"></div>
+      <div class="how-dot"></div>
+      <div class="how-dot"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FEATURES ═══ -->
+<section id="features">
+  <div class="section-label cin">Seguridad</div>
+  <h2 class="cin cin-d1">Cada capa.<br/><em>Impenetrable.</em></h2>
+  <p class="section-desc cin cin-d2">Diseñado desde cero para que ni siquiera nosotros podamos leer tus mensajes.</p>
+  <div class="features-grid">
+    <div class="feat-card cin">
+      <div class="feat-icon">🛡️</div>
+      <h3>Zero-Knowledge</h3>
+      <p>El servidor solo almacena blobs binarios cifrados. No conoce el remitente, el destinatario, ni el contenido de ningún mensaje.</p>
+      <div class="feat-mono">server_knowledge = ∅</div>
+    </div>
+    <div class="feat-card cin cin-d1">
+      <div class="feat-icon">🔐</div>
+      <h3>Cifrado Híbrido <span class="term" data-label="End-to-End Encryption" data-tip="Cifrado de extremo a extremo: el mensaje se cifra en tu dispositivo y solo se descifra en el del destinatario. Nadie en el medio puede leerlo.">E2EE</span></h3>
+      <p><span class="term" data-label="AES-256-GCM" data-tip="El estándar de cifrado simétrico más robusto del mundo. Usa una clave de 256 bits — probar todas las combinaciones llevaría más tiempo que la edad del universo.">AES-256-GCM</span> cifra el contenido. <span class="term" data-label="RSA-2048 OAEP" data-tip="Algoritmo de cifrado asimétrico. Tu clave pública cifra, solo tu clave privada descifra.">RSA-2048 OAEP</span> envuelve la clave de sesión. Doble cerrojo: solo el destinatario puede abrir.</p>
+      <div class="feat-mono">AES-256-GCM + RSA-2048 OAEP</div>
+    </div>
+    <div class="feat-card cin cin-d2">
+      <div class="feat-icon">👤</div>
+      <h3>Identidad Sin Registro</h3>
+      <p>Sin número de teléfono. Sin email. Tu identidad es un par de claves criptográficas generadas localmente.</p>
+      <div class="feat-mono">ID = SHA256(PK) → Base58</div>
+    </div>
+    <div class="feat-card cin cin-d3">
+      <div class="feat-icon">📦</div>
+      <h3>Tráfico Uniforme</h3>
+      <p>Todas las imágenes pesan exactamente lo mismo (~1.5 MB). El análisis de tráfico por tamaño de paquete es inútil.</p>
+      <div class="feat-mono">payload_size = const</div>
+    </div>
+    <div class="feat-card cin cin-d1">
+      <div class="feat-icon">⏱️</div>
+      <h3>Buzón Efímero 48h</h3>
+      <p>El servidor borra los mensajes tras la entrega. No existe historial alguno del lado del servidor.</p>
+      <div class="feat-mono">TTL = 48h → purge()</div>
+    </div>
+    <div class="feat-card cin cin-d2">
+      <div class="feat-icon">💥</div>
+      <h3>Auto-Destrucción</h3>
+      <p>N intentos de PIN fallidos borran el keystore local automáticamente. Sin rastro. El dispositivo queda limpio.</p>
+      <div class="feat-mono">pin_fails ≥ N → wipe()</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CRYPTO TECH ═══ -->
+<section id="stego">
+  <div class="stego-inner">
+    <div>
+      <div class="section-label cin">Tecnología</div>
+      <h2 class="cin cin-d1">Un payload.<br/><em>Nadie lo abre.</em></h2>
+      <p class="section-desc cin cin-d2">El servidor recibe un blob binario cifrado. Sin metadatos, sin contexto. Solo bytes que únicamente el destinatario puede descifrar.</p>
+      <div class="stego-steps cin cin-d3">
+        <div class="stego-step">
+          <div class="stego-step-num">1</div>
+          <p><strong>Envelope JSON</strong> — El mensaje se empaqueta con remitente, clave pública y timestamp.</p>
+        </div>
+        <div class="stego-step">
+          <div class="stego-step-num">2</div>
+          <p><strong>AES-256-GCM</strong> — El envelope JSON se cifra con una clave de sesión aleatoria de 32 bytes + IV + authTag.</p>
+        </div>
+        <div class="stego-step">
+          <div class="stego-step-num">3</div>
+          <p><strong>RSA-2048 OAEP</strong> — La clave de sesión se cifra con la clave pública RSA del destinatario.</p>
+        </div>
+        <div class="stego-step">
+          <div class="stego-step-num">4</div>
+          <p><strong>Blob opaco</strong> — El payload se envía como base64 al servidor. Ningún intermediario puede leerlo.</p>
+        </div>
+      </div>
+    </div>
+    <div class="cin cin-d1">
+      <div class="pixel-grid" id="pixel-grid"></div>
+      <div class="stego-label" id="pixel-label">IMAGEN ORIGINAL</div>
+      <div class="bit-stream">
+        10110010 11001010 10101100<br/>
+        01101001 <span class="b1">1</span>0110100 1<span class="b1">1</span>01001<span class="b1">0</span><br/>
+        1<span class="b1">1</span>0<span class="b1">0</span>101<span class="b1">0</span> 10<span class="b1">1</span>10011 01001101<br/>
+        <span style="color:var(--muted);font-size:.6rem">↑ bits LSB modificados (marcados en azul)</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ AUDIENCE ═══ -->
+<section id="audience">
+  <div style="text-align:center">
+    <div class="section-label cin">¿Para quién?</div>
+    <h2 class="cin cin-d1">Para quien tiene<br/>algo que <em>proteger.</em></h2>
+    <p class="section-desc cin cin-d2" style="margin:0 auto">No para quien tiene algo que ocultar.</p>
+  </div>
+  <div class="audience-grid">
+    <div class="aud-card cin">
+      <div class="aud-icon">📰</div>
+      <h3>Periodistas</h3>
+      <p>Protege fuentes confidenciales bajo regímenes que vigilan el tráfico de mensajería convencional.</p>
+    </div>
+    <div class="aud-card cin cin-d1">
+      <div class="aud-icon">✊</div>
+      <h3>Activistas</h3>
+      <p>Coordina acciones sin dejar rastro de metadatos. Sin grafo social. Sin historial en servidores.</p>
+    </div>
+    <div class="aud-card cin cin-d2">
+      <div class="aud-icon">🔬</div>
+      <h3>Investigadores de Seguridad</h3>
+      <p>Comunica hallazgos sensibles de vulnerabilidades de forma completamente privada.</p>
+    </div>
+    <div class="aud-card cin cin-d3">
+      <div class="aud-icon">⚖️</div>
+      <h3>Abogados y Médicos</h3>
+      <p>Protege la confidencialidad profesional con un canal de privilegio absoluto.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ═══ -->
+<section id="cta">
+  <div class="section-label cin" style="text-align:center">Descarga</div>
+  <h2 class="cin cin-d1">Tu privacidad.<br/><em>Empieza hoy.</em></h2>
+  <p class="cin cin-d2">Abre la app. Genera tu identidad. Listo. Sin formularios, sin verificaciones, sin cuentas.</p>
+  <div class="cin cin-d3" style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2rem">
+    <button class="btn-primary">Descargar para Android</button>
+  </div>
+  <div class="cta-tags cin cin-d4">
+    <span class="cta-tag">AES-256-GCM</span>
+    <span class="cta-tag">RSA-2048 OAEP</span>
+    <span class="cta-tag">Zero-Knowledge</span>
+    <span class="cta-tag">ODS 5 · 9 · 10 · 12 · 13 · 16</span>
+    <span class="cta-tag">Green IT −95%</span>
+    <span class="cta-tag">Open Source</span>
+  </div>
+</section>
+
+<!-- ═══ APP SCREENSHOTS ═══ -->
+<section id="screenshots" style="padding:110px 6vw 140px; overflow:hidden;">
+  <div style="text-align:center; margin-bottom:4.5rem;">
+    <div class="section-label cin" style="text-align:center">La app</div>
+    <h2 class="cin cin-d1">Cada pantalla,<br/><em>sin nada que esconder.</em></h2>
+    <p class="section-desc cin cin-d2" style="margin:1rem auto 0">Interfaz oscura, minimalista. Sin fricciones. Sin datos innecesarios.</p>
+  </div>
+
+  <div class="cin" style="display:flex; gap:2.8rem; justify-content:center; align-items:flex-end; flex-wrap:wrap; padding-bottom:3rem;">
+
+    <!-- Phone 1 — Bienvenida -->
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="phone-screen" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.1rem;padding:1.5rem 1rem;">
+        <img src="assets/logo-new.png" style="width:72px;filter:drop-shadow(0 0 14px rgba(59,130,246,.5))" alt="logo"/>
+        <div style="font-family:var(--font-display);font-size:.88rem;font-weight:700;color:#e8edf5;text-align:center;line-height:1.3">Bienvenido<br/>a Hermnet</div>
+        <div style="font-size:.58rem;color:#4a5a72;text-align:center;line-height:1.6">Sin cuenta. Sin número.<br/>Solo tú y tus claves.</div>
+        <div style="margin-top:.4rem;background:#3b82f6;color:#fff;font-size:.6rem;font-weight:700;padding:.5rem 1.2rem;border-radius:7px;letter-spacing:.04em">GENERAR CLAVE PRIVADA</div>
+      </div>
+      <div class="phone-label">Bienvenida</div>
+    </div>
+
+    <!-- Phone 2 — Lista chats -->
+    <div class="phone-frame phone-tall">
+      <div class="phone-notch"></div>
+      <div class="phone-screen" style="display:flex;flex-direction:column;padding:.9rem .8rem;gap:.55rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-family:var(--font-display);font-size:.78rem;font-weight:700;color:#e8edf5">Chats</span>
+          <div style="width:22px;height:22px;border-radius:50%;background:rgba(59,130,246,.15);display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#3b82f6">+</div>
+        </div>
+        <div style="background:rgba(255,255,255,.04);border-radius:7px;padding:.4rem .6rem;font-size:.58rem;color:#3d4f65">🔍 Buscar…</div>
+        <div style="display:flex;flex-direction:column;gap:.5rem;margin-top:.2rem;">
+          <div style="display:flex;gap:.55rem;align-items:center">
+            <div style="width:28px;height:28px;border-radius:50%;background:rgba(59,130,246,.2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#3b82f6">Á</div>
+            <div style="flex:1;min-width:0"><div style="font-size:.6rem;font-weight:600;color:#e8edf5">Álvaro</div><div style="font-size:.52rem;color:#3d4f65">Mensaje cifrado recibido</div></div>
+            <span style="font-size:.48rem;color:#3d4f65">12:04</span>
+          </div>
+          <div style="display:flex;gap:.55rem;align-items:center">
+            <div style="width:28px;height:28px;border-radius:50%;background:rgba(6,182,212,.2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#06b6d4">S</div>
+            <div style="flex:1;min-width:0"><div style="font-size:.6rem;font-weight:600;color:#e8edf5">Sara</div><div style="font-size:.52rem;color:#3d4f65">Mensaje cifrado recibido</div></div>
+            <span style="font-size:.48rem;color:#3d4f65">09:31</span>
+          </div>
+          <div style="display:flex;gap:.55rem;align-items:center;opacity:.45">
+            <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.05);flex-shrink:0"></div>
+            <div style="flex:1;height:7px;background:rgba(255,255,255,.05);border-radius:4px"></div>
+          </div>
+          <div style="display:flex;gap:.55rem;align-items:center;opacity:.25">
+            <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.04);flex-shrink:0"></div>
+            <div style="flex:1;height:7px;background:rgba(255,255,255,.04);border-radius:4px"></div>
+          </div>
+        </div>
+        <div style="margin-top:auto;display:flex;justify-content:flex-end;">
+          <div style="width:32px;height:32px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;font-size:.85rem;box-shadow:0 0 14px rgba(59,130,246,.4)">🛡️</div>
+        </div>
+      </div>
+      <div class="phone-label">Lista de Chats</div>
+    </div>
+
+    <!-- Phone 3 — Chat individual -->
+    <div class="phone-frame phone-tallest">
+      <div class="phone-notch"></div>
+      <div class="phone-screen" style="display:flex;flex-direction:column;padding:.75rem .8rem;gap:.45rem;">
+        <div style="display:flex;align-items:center;gap:.45rem;padding-bottom:.3rem;border-bottom:1px solid rgba(255,255,255,.05)">
+          <span style="color:#3b82f6;font-size:.65rem">&#8592;</span>
+          <div style="width:22px;height:22px;border-radius:50%;background:rgba(59,130,246,.2);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:#3b82f6">Á</div>
+          <span style="font-size:.65rem;font-weight:600;color:#e8edf5">Álvaro</span>
+          <span style="margin-left:auto;font-size:.5rem;color:#3d4f65">E2EE ✓</span>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:.45rem;justify-content:flex-end;">
+          <div style="align-self:flex-start;background:rgba(255,255,255,.07);border-radius:10px 10px 10px 2px;padding:.4rem .6rem;max-width:78%;">
+            <div style="font-size:.56rem;color:#e8edf5">¿Hora de la reunión?</div>
+            <div style="font-size:.46rem;color:#3d4f65;margin-top:.15rem">12:02 · E2EE ✓</div>
+          </div>
+          <div style="align-self:flex-end;background:rgba(59,130,246,.2);border-radius:10px 10px 2px 10px;padding:.4rem .6rem;max-width:78%;">
+            <div style="font-size:.56rem;color:#e8edf5">A las 18h, lugar habitual</div>
+            <div style="font-size:.46rem;color:#3d4f65;margin-top:.15rem">12:04 · ✓✓</div>
+          </div>
+          <div style="align-self:flex-start;background:rgba(255,255,255,.07);border-radius:10px 10px 10px 2px;padding:.4rem .6rem;max-width:78%;">
+            <div style="font-size:.56rem;color:#e8edf5">Perfecto, allí estaré</div>
+            <div style="font-size:.46rem;color:#3d4f65;margin-top:.15rem">12:09 · E2EE ✓</div>
+          </div>
+          <div style="align-self:flex-end;background:rgba(59,130,246,.2);border-radius:10px 10px 2px 10px;padding:.4rem .6rem;max-width:78%;">
+            <div style="font-size:.56rem;color:#e8edf5">👍</div>
+            <div style="font-size:.46rem;color:#3d4f65;margin-top:.15rem">12:11 · ✓✓</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:.45rem;background:rgba(255,255,255,.05);border-radius:18px;padding:.35rem .6rem;">
+          <span style="font-size:.52rem;color:#3d4f65;flex:1">Escribe un mensaje…</span>
+          <div style="width:20px;height:20px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;font-size:.55rem">&#8593;</div>
+        </div>
+      </div>
+      <div class="phone-label">Chat Individual</div>
+    </div>
+
+    <!-- Phone 4 — QR -->
+    <div class="phone-frame phone-tall">
+      <div class="phone-notch"></div>
+      <div class="phone-screen" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.85rem;padding:1.1rem .9rem;">
+        <div style="font-family:var(--font-display);font-size:.72rem;font-weight:700;color:#e8edf5">Tu identidad</div>
+        <div style="width:88px;height:88px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding:7px;">
+          <div style="grid-column:1/3;grid-row:1/3;background:rgba(59,130,246,.85);border-radius:2px"></div>
+          <div style="grid-column:6/8;grid-row:1/3;background:rgba(59,130,246,.85);border-radius:2px"></div>
+          <div style="grid-column:1/3;grid-row:6/8;background:rgba(59,130,246,.85);border-radius:2px"></div>
+          <div style="grid-column:4;grid-row:3;background:rgba(59,130,246,.5);border-radius:1px"></div>
+          <div style="grid-column:6;grid-row:4;background:rgba(59,130,246,.4);border-radius:1px"></div>
+          <div style="grid-column:3;grid-row:5;background:rgba(59,130,246,.5);border-radius:1px"></div>
+          <div style="grid-column:5;grid-row:6;background:rgba(59,130,246,.4);border-radius:1px"></div>
+          <div style="grid-column:7;grid-row:5;background:rgba(59,130,246,.3);border-radius:1px"></div>
+          <div style="grid-column:4;grid-row:7;background:rgba(59,130,246,.5);border-radius:1px"></div>
+        </div>
+        <div style="font-size:.52rem;color:#3d4f65;font-family:monospace">HNET-7a2b-91zM</div>
+        <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.18);border-radius:8px;padding:.45rem .7rem;text-align:center;">
+          <div style="font-size:.52rem;color:#ef4444;font-weight:600">&#9888; ¿Compartir tu QR?</div>
+        </div>
+        <div style="background:rgba(59,130,246,.18);color:#3b82f6;font-size:.58rem;font-weight:600;padding:.38rem .95rem;border-radius:6px;">Confirmar</div>
+      </div>
+      <div class="phone-label">Compartir QR</div>
+    </div>
+
+    <!-- Phone 5 — Ajustes -->
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="phone-screen" style="display:flex;flex-direction:column;padding:.9rem .8rem;gap:.5rem;">
+        <div style="font-family:var(--font-display);font-size:.78rem;font-weight:700;color:#e8edf5;margin-bottom:.3rem">Ajustes</div>
+        <div style="font-size:.5rem;color:#3d4f65;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.1rem">Cuenta</div>
+        <div style="background:rgba(255,255,255,.04);border-radius:8px;overflow:hidden">
+          <div style="padding:.45rem .65rem;font-size:.58rem;color:#e8edf5;border-bottom:1px solid rgba(255,255,255,.04)">🔑 Mi identidad</div>
+          <div style="padding:.45rem .65rem;font-size:.58rem;color:#e8edf5">📦 Exportar .hnet</div>
+        </div>
+        <div style="font-size:.5rem;color:#3d4f65;text-transform:uppercase;letter-spacing:.1em;margin:.25rem 0 .1rem">Seguridad</div>
+        <div style="background:rgba(255,255,255,.04);border-radius:8px;overflow:hidden">
+          <div style="padding:.45rem .65rem;font-size:.58rem;color:#e8edf5;border-bottom:1px solid rgba(255,255,255,.04)">🛡️ PIN / Biometría</div>
+          <div style="padding:.45rem .65rem;font-size:.58rem;color:#e8edf5">🔔 Notificaciones</div>
+        </div>
+        <div style="font-size:.5rem;color:#3d4f65;text-transform:uppercase;letter-spacing:.1em;margin:.25rem 0 .1rem">Peligro</div>
+        <div style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.14);border-radius:8px;padding:.45rem .65rem;font-size:.58rem;color:#ef4444">🗑 Eliminar cuenta</div>
+      </div>
+      <div class="phone-label">Ajustes</div>
+    </div>
+
+  </div>
+
+  <p class="cin" style="text-align:center;margin-top:1rem;font-size:.75rem;color:var(--muted);font-style:italic">Capturas reales de la aplicación próximamente.</p>
+</section>
+
+<!-- ═══ GREEN IT ═══ -->
+<section id="greenIT" style="padding:110px 6vw; border-top:1px solid var(--border);">
+  <div class="section-label cin" style="text-align:center; margin-bottom:.5rem">Impacto ambiental</div>
+  <h2 class="cin cin-d1" style="text-align:center">Green IT.<br/><em>Datos reales.</em></h2>
+  <p class="section-desc cin cin-d2" style="margin:1rem auto 0; text-align:center">Cada decisión de arquitectura tiene un impacto ambiental. Hermnet elige la eficiencia por principio.</p>
+  <div class="stats-row cin cin-d3">
+    <div class="stat-block">
+      <div class="stat-num">95%</div>
+      <div class="stat-label">Reducción de tráfico<br/>por mensaje</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-num">~0.9<span style="font-size:1.4rem">KB</span></div>
+      <div class="stat-label">Tamaño actual<br/>por mensaje</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-num" style="font-size:clamp(1.6rem,3vw,2.4rem)">16.5<span style="font-size:1.2rem">KB</span></div>
+      <div class="stat-label">Mensajería<br/>convencional típica</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-num" style="font-size:clamp(1.4rem,3vw,2rem)">750<span style="font-size:1.1rem">GB</span></div>
+      <div class="stat-label">Ahorro/día estimado<br/>a 1M usuarios</div>
+    </div>
+    <div class="stat-block">
+      <div class="stat-num" style="font-size:clamp(1.4rem,3vw,2rem)">45<span style="font-size:1.1rem">kg</span></div>
+      <div class="stat-label"><span class="term" data-label="CO₂ equivalente" data-tip="Medida estándar para comparar el impacto climático de diferentes gases de efecto invernadero. Todo se convierte a su equivalente en CO₂.">CO₂eq</span> evitado/día<br/>a escala</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ODS ═══ -->
+<section id="ods" style="padding:110px 6vw;">
+  <div class="section-label cin" style="text-align:center">Objetivos de Desarrollo Sostenible</div>
+  <h2 class="cin cin-d1" style="text-align:center">Tecnología con <em>propósito.</em></h2>
+  <p class="section-desc cin cin-d2" style="margin:1rem auto 0; text-align:center">Hermnet está alineado con seis ODS de la Agenda 2030 de Naciones Unidas.</p>
+  <div class="ods-grid">
+
+    <div class="ods-card cin" style="border-color:rgba(0,122,61,.3)">
+      <div class="ods-num" style="color:#009f3d">16</div>
+      <h3>Paz, Justicia e Instituciones Sólidas ⭐</h3>
+      <p>Las comunicaciones cifradas E2EE son infraestructura para el ejercicio de la libertad de expresión, especialmente en regímenes autoritarios. Protege a periodistas, activistas y denunciantes.</p>
+      <span class="ods-tag" style="background:rgba(0,159,61,.12);color:#009f3d">Alineación principal</span>
+    </div>
+
+    <div class="ods-card cin cin-d1" style="border-color:rgba(253,105,37,.3)">
+      <div class="ods-num" style="color:#fd6925">9</div>
+      <h3>Industria, Innovación e Infraestructura</h3>
+      <p>Aplicación práctica de criptografía moderna (RSA-OAEP-SHA256, AES-256-GCM). Arquitectura zero-knowledge verificable. Privacidad técnica accesible.</p>
+      <span class="ods-tag" style="background:rgba(253,105,37,.1);color:#fd6925">Innovación tecnológica</span>
+    </div>
+
+    <div class="ods-card cin cin-d2" style="border-color:rgba(239,64,42,.3)">
+      <div class="ods-num" style="color:#ef402a">5</div>
+      <h3>Igualdad de Género</h3>
+      <p>Víctimas de violencia de género dependen de comunicaciones seguras. El ID HNET-XXXX no es vinculable a un número personal → mayor seguridad para colectivos en riesgo.</p>
+      <span class="ods-tag" style="background:rgba(239,64,42,.1);color:#ef402a">Impacto social directo</span>
+    </div>
+
+    <div class="ods-card cin cin-d3" style="border-color:rgba(221,22,26,.3)">
+      <div class="ods-num" style="color:#dd161a">10</div>
+      <h3>Reducción de las Desigualdades</h3>
+      <p>La privacidad de calidad estaba reservada a quienes podían pagar servicios premium. Hermnet es software libre, gratuito, sin perfil personal. Democratiza el acceso a la privacidad.</p>
+      <span class="ods-tag" style="background:rgba(221,22,26,.1);color:#dd161a">Inclusión digital</span>
+    </div>
+
+    <div class="ods-card cin" style="border-color:rgba(191,139,46,.3)">
+      <div class="ods-num" style="color:#bf8b2e">12</div>
+      <h3>Producción y Consumo Responsables</h3>
+      <p>Minimización de datos por diseño (<span class="term" data-label="RGPD" data-tip="Reglamento General de Protección de Datos. La ley europea más importante sobre privacidad digital, vigente desde 2018. Exige minimización de datos y consentimiento explícito.">RGPD</span> art. 5.1.c). Solo se almacena lo estrictamente necesario. El servidor purga el buzón tras la entrega. Sin backups silenciosos.</p>
+      <span class="ods-tag" style="background:rgba(191,139,46,.1);color:#bf8b2e"><span class="term" data-label="Privacy by Design" data-tip="Principio del RGPD: la privacidad se incorpora desde el diseño del sistema, no como añadido posterior. Hermnet es un ejemplo canónico.">Privacy by Design</span></span>
+    </div>
+
+    <div class="ods-card cin cin-d1" style="border-color:rgba(63,126,68,.3)">
+      <div class="ods-num" style="color:#3f7e44">13</div>
+      <h3>Acción por el Clima</h3>
+      <p>Payloads de ~0.9 KB por mensaje — 95% menos que una app de mensajería convencional. Sin almacenamiento perpetuo en servidor. Infraestructura cloud con energía renovable.</p>
+      <span class="ods-tag" style="background:rgba(63,126,68,.1);color:#3f7e44">Green IT · 30% EMR</span>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ IROs ═══ -->
+<section id="iros" style="padding:110px 6vw; background:var(--surface); border-top:1px solid var(--border); border-bottom:1px solid var(--border);">
+  <div class="section-label cin" style="text-align:center">Análisis de <span class="term" data-label="Doble materialidad" data-tip="Metodología CSRD: evalúa el impacto de la empresa sobre el mundo Y el impacto del mundo sobre la empresa. Estándar europeo de reporting de sostenibilidad.">doble materialidad</span></div>
+  <h2 class="cin cin-d1" style="text-align:center">Impactos, Riesgos<br/>y <em>Oportunidades.</em></h2>
+  <p class="section-desc cin cin-d2" style="margin:1rem auto 0; text-align:center">Metodología CSRD-aligned (<span class="term" data-label="EFRAG ESRS" data-tip="EFRAG es el organismo europeo que elabora estándares de reporting de sostenibilidad (ESRS). Sus normas definen cómo medir y comunicar impactos ambientales y sociales.">EFRAG ESRS</span>). Material si Score P×M ≥ 12/25.</p>
+  <div class="iro-grid">
+
+    <div class="iro-card cin" style="border-color:rgba(59,130,246,.25)">
+      <div class="iro-type" style="color:var(--accent)">▲ IMPACTO POSITIVO · Social</div>
+      <div class="iro-score" style="color:var(--accent)">25<span style="font-size:1rem;color:var(--muted)">/25</span></div>
+      <h3>Protección de colectivos vulnerables</h3>
+      <p>Comunicaciones cifradas para periodistas, activistas, víctimas de violencia de género y denunciantes. Demanda demostrada (Signal, casos Signal Foundation).</p>
+      <span class="iro-badge" style="background:rgba(59,130,246,.15);color:var(--accent)">MATERIAL ✅ · ODS 5, 10, 16</span>
+    </div>
+
+    <div class="iro-card cin cin-d1" style="border-color:rgba(16,185,129,.25)">
+      <div class="iro-type" style="color:#10b981">◆ OPORTUNIDAD · Económica</div>
+      <div class="iro-score" style="color:#10b981">20<span style="font-size:1rem;color:var(--muted)">/25</span></div>
+      <h3>Mercado en expansión regulatoria UE</h3>
+      <p>RGPD vigente, <span class="term" data-label="NIS2" data-tip="Directiva europea de ciberseguridad para infraestructuras críticas. Obliga a sectores clave a adoptar medidas de seguridad más estrictas y reportar incidentes.">NIS2</span> en transposición, <span class="term" data-label="AI Act" data-tip="Primer reglamento mundial que clasifica y regula los sistemas de inteligencia artificial según su nivel de riesgo. En vigor desde 2024 en la UE.">AI Act</span> 2024, <span class="term" data-label="Digital Markets Act" data-tip="Ley de Mercados Digitales de la UE. Obliga a las grandes plataformas tecnológicas a ser más abiertas e interoperables, fomentando la competencia.">Digital Markets Act</span>. Mercado europeo de privacidad estimado en €50B/año. Posicionamiento como "GDPR-native".</p>
+      <span class="iro-badge" style="background:rgba(16,185,129,.12);color:#10b981">MATERIAL ✅ · Estratégico</span>
+    </div>
+
+    <div class="iro-card cin cin-d2" style="border-color:rgba(239,68,68,.25)">
+      <div class="iro-type" style="color:#ef4444">▼ RIESGO · Legal/Reputacional</div>
+      <div class="iro-score" style="color:#ef4444">16<span style="font-size:1rem;color:var(--muted)">/25</span></div>
+      <h3>Uso indebido (<span class="term" data-label="Dual-use" data-tip="Tecnología que puede usarse tanto para fines legítimos como ilegales. El cifrado fuerte es el ejemplo más claro: protege a periodistas y también puede usarlo el crimen organizado.">dual-use</span>)</h3>
+      <p>Toda herramienta de cifrado fuerte es de doble uso. Mitigación: imposibilidad técnica de cooperar incluso con orden judicial (zero-knowledge). No podemos entregar lo que no tenemos.</p>
+      <span class="iro-badge" style="background:rgba(239,68,68,.1);color:#ef4444">MATERIAL ✅ · Mitigado</span>
+    </div>
+
+    <div class="iro-card cin cin-d3" style="border-color:rgba(251,191,36,.25)">
+      <div class="iro-type" style="color:#fbbf24">▼ RIESGO · Tecnológico largo plazo</div>
+      <div class="iro-score" style="color:#fbbf24">10<span style="font-size:1rem;color:var(--muted)">/25</span></div>
+      <h3>Computación cuántica (post-2030)</h3>
+      <p>RSA-2048 es vulnerable al <span class="term" data-label="Algoritmo de Shor" data-tip="Algoritmo teórico que, ejecutado en un ordenador cuántico suficientemente potente, rompería RSA en horas. Aún no existe hardware para hacerlo, pero define el riesgo futuro.">algoritmo de Shor</span>. NIST estandarizó <span class="term" data-label="CRYSTALS-Kyber" data-tip="Algoritmo criptográfico resistente a ordenadores cuánticos, estandarizado por el NIST en 2024. El sucesor post-cuántico del cifrado de clave pública actual.">CRYSTALS-Kyber</span> y <span class="term" data-label="CRYSTALS-Dilithium" data-tip="Algoritmo de firma digital post-cuántico estandarizado por el NIST en 2024. Equivalente post-cuántico de RSA para firmar datos.">CRYSTALS-Dilithium</span> en 2024. Roadmap: migración a cifrado híbrido clásico + post-cuántico (como <span class="term" data-label="PQXDH" data-tip="Protocolo de intercambio de claves híbrido post-cuántico usado por Signal. Combina criptografía clásica con resistencia cuántica.">PQXDH</span> de Signal).</p>
+      <span class="iro-badge" style="background:rgba(251,191,36,.1);color:#fbbf24">HORIZONTE 5-10 AÑOS ⚠️</span>
+    </div>
+
+    <div class="iro-card cin" style="border-color:rgba(63,126,68,.25)">
+      <div class="iro-type" style="color:#3f7e44">▲ IMPACTO POSITIVO · Ambiental</div>
+      <div class="iro-score" style="color:#3f7e44">10<span style="font-size:1rem;color:var(--muted)">/25</span></div>
+      <h3>Eficiencia y minimización de datos</h3>
+      <p>Un 95% menos de tráfico de red por mensaje que una app de mensajería convencional. ~750 GB/día ahorrados a escala de 1M usuarios. ~45 kg <span class="term" data-label="CO₂ equivalente" data-tip="Medida estándar para comparar el impacto climático de diferentes gases de efecto invernadero. Todo se convierte a su equivalente en CO₂.">CO₂eq</span>/día evitados.</p>
+      <span class="iro-badge" style="background:rgba(63,126,68,.1);color:#3f7e44">MATERIAL EJEMPLAR ✅ · ODS 13</span>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ ORIGIN ═══ -->
+<section id="origin" style="padding:100px 6vw; border-top:1px solid var(--border);">
+  <div style="max-width:740px; margin:0 auto; text-align:center;">
+    <div class="section-label cin" style="text-align:center">El nombre</div>
+    <h2 class="cin cin-d1"><em>Hermes</em> + Network</h2>
+    <p class="cin cin-d2" style="color:var(--steel);font-size:1rem;line-height:1.85;margin:1.4rem auto 0;max-width:580px">
+      <strong style="color:var(--text)">Herm</strong> viene de Hermes, el mensajero de los dioses, y de hermético — un sistema cerrado e impenetrable.
+      <strong style="color:var(--text)">Net</strong> es la red sobre la que corre.
+      Juntos: una red de mensajería protegida donde la comunicación fluye sin dejar rastro.
+    </p>
+  </div>
+</section>
+
+<!-- ═══ AUTHORS ═══ -->
+<section id="authors" style="padding:80px 6vw 100px; text-align:center;">
+  <div class="section-label cin" style="text-align:center; margin-bottom:2.8rem">Desarrollado por</div>
+  <div class="cin" style="display:flex; gap:3rem; justify-content:center; flex-wrap:wrap; align-items:flex-start;">
+
+    <a href="https://github.com/franciscorodalf" target="_blank" style="text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:.7rem;">
+      <div style="width:72px;height:72px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:var(--accent);transition:border-color .2s,transform .2s;" onmouseover="this.style.borderColor='var(--accent)';this.style.transform='scale(1.07)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform=''">F</div>
+      <span style="font-family:var(--font-display);font-weight:700;font-size:1rem;color:var(--text)">Francisco Rodal</span>
+      <span style="font-size:.75rem;color:var(--muted);font-family:monospace">@franciscorodalf</span>
+      <span style="font-size:.78rem;color:var(--steel)">Frontend &amp; Mobile</span>
+    </a>
+
+    <a href="https://github.com/alvarogrlp" target="_blank" style="text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:.7rem;">
+      <div style="width:72px;height:72px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:var(--accent);transition:border-color .2s,transform .2s;" onmouseover="this.style.borderColor='var(--accent)';this.style.transform='scale(1.07)'" onmouseout="this.style.borderColor='var(--border)';this.style.transform=''">Á</div>
+      <span style="font-family:var(--font-display);font-weight:700;font-size:1rem;color:var(--text)">Álvaro García</span>
+      <span style="font-size:.75rem;color:var(--muted);font-family:monospace">@alvarogrlp</span>
+      <span style="font-size:.78rem;color:var(--steel)">Backend &amp; Criptografía</span>
+    </a>
+
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">
+    <img src="assets/logo-new.png" alt="Hermnet" />
+    <span>HERMNET</span>
+  </div>
+  <p>Hecho con ♥ por <a href="https://github.com/franciscorodalf" target="_blank" style="color:var(--accent);text-decoration:none">@franciscorodalf</a> &amp; <a href="https://github.com/alvarogrlp" target="_blank" style="color:var(--accent);text-decoration:none">@alvarogrlp</a></p>
+</footer>
+
+<!-- ══════════════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════════════ -->
+<script>
+// ── LIGHT TRAILS CANVAS (disabled — using CSS glow) ──────────────────────────
+(function(){
+  return; // replaced by .bg-glow CSS
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H;
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Comets / light trails
+  const TRAIL_LEN = 60;
+  const comets = [];
+
+  function makeComet() {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 0.6 + Math.random() * 1.4;
+    const hue = Math.random() < 0.7 ? 210 + Math.random() * 30 : 185 + Math.random() * 20; // blue/cyan
+    return {
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      trail: [],
+      hue,
+      sat: 70 + Math.random() * 30,
+      bright: 55 + Math.random() * 30,
+      alpha: 0.4 + Math.random() * 0.5,
+      size: 0.8 + Math.random() * 1.6,
+      life: 1,
+    };
+  }
+
+  for (let i = 0; i < 28; i++) comets.push(makeComet());
+
+  // Static dim "star" nodes
+  const nodes = Array.from({length: 60}, () => ({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    r: Math.random() * 1.2,
+    alpha: 0.08 + Math.random() * 0.14,
+  }));
+
+  function drawFrame() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Dim nodes
+    nodes.forEach(n => {
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(120,160,255,${n.alpha})`;
+      ctx.fill();
+    });
+
+    // Connections between nearby nodes
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i+1; j < nodes.length; j++) {
+        const d = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y);
+        if (d < 120) {
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.strokeStyle = `rgba(59,130,246,${0.04 * (1 - d/120)})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Comets
+    comets.forEach((c, idx) => {
+      c.trail.push({ x: c.x, y: c.y });
+      if (c.trail.length > TRAIL_LEN) c.trail.shift();
+
+      c.x += c.vx;
+      c.y += c.vy;
+
+      // Wrap or respawn
+      if (c.x < -80 || c.x > W + 80 || c.y < -80 || c.y > H + 80) {
+        comets[idx] = makeComet();
+        return;
+      }
+
+      // Draw trail as gradient line
+      if (c.trail.length < 2) return;
+      for (let i = 1; i < c.trail.length; i++) {
+        const t = i / c.trail.length;
+        const a = t * c.alpha * 0.8;
+        ctx.beginPath();
+        ctx.moveTo(c.trail[i-1].x, c.trail[i-1].y);
+        ctx.lineTo(c.trail[i].x, c.trail[i].y);
+        ctx.strokeStyle = `hsla(${c.hue},${c.sat}%,${c.bright}%,${a})`;
+        ctx.lineWidth = c.size * t;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+      }
+
+      // Head glow
+      const grd = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, c.size * 5);
+      grd.addColorStop(0, `hsla(${c.hue},100%,80%,${c.alpha})`);
+      grd.addColorStop(1, 'transparent');
+      ctx.beginPath();
+      ctx.arc(c.x, c.y, c.size * 5, 0, Math.PI * 2);
+      ctx.fillStyle = grd;
+      ctx.fill();
+    });
+
+    requestAnimationFrame(drawFrame);
+  }
+  drawFrame();
+})();
+
+// ── NAV ───────────────────────────────────────────────────────────────────────
+const nav = document.getElementById('main-nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+}, { passive: true });
+
+// ── CINEMATIC PARALLAX ON SCROLL ─────────────────────────────────────────────
+const hero = document.getElementById('hero');
+const heroLogoWrap = hero.querySelector('.hero-logo-wrap');
+const heroH1 = hero.querySelector('h1');
+const heroSub = hero.querySelector('.hero-sub');
+
+window.addEventListener('scroll', () => {
+  const sy = window.scrollY;
+  const vh = window.innerHeight;
+
+  // Hero parallax — logo rises, text fades as you scroll
+  const heroProgress = Math.min(sy / vh, 1);
+  heroLogoWrap.style.transform = `translateY(${-heroProgress * 60}px) scale(${1 - heroProgress * 0.08})`;
+  heroLogoWrap.style.opacity = 1 - heroProgress * 1.4;
+  if (heroH1) {
+    heroH1.style.transform = `translateY(${-heroProgress * 30}px)`;
+    heroH1.style.opacity = 1 - heroProgress * 1.6;
+  }
+  if (heroSub) {
+    heroSub.style.transform = `translateY(${-heroProgress * 18}px)`;
+    heroSub.style.opacity = 1 - heroProgress * 1.8;
+  }
+}, { passive: true });
+
+// ── INTERSECTION OBSERVER — cinematic reveal ──────────────────────────────────
+const cinEls = document.querySelectorAll('.cin');
+// Immediately show hero elements
+document.querySelectorAll('#hero .cin').forEach(el => el.classList.add('in'));
+
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.1 });
+cinEls.forEach(el => {
+  if (!el.closest('#hero')) io.observe(el);
+});
+
+// ── HOW TRACK — drag scroll ───────────────────────────────────────────────────
+const track = document.getElementById('how-track');
+let isDown = false, startX, scrollLeft;
+track.addEventListener('mousedown', e => {
+  isDown = true; track.classList.add('grabbing');
+  startX = e.pageX - track.offsetLeft; scrollLeft = track.scrollLeft;
+});
+track.addEventListener('mouseleave', () => { isDown = false; track.classList.remove('grabbing'); });
+track.addEventListener('mouseup', () => { isDown = false; track.classList.remove('grabbing'); });
+track.addEventListener('mousemove', e => {
+  if (!isDown) return; e.preventDefault();
+  const x = e.pageX - track.offsetLeft;
+  track.scrollLeft = scrollLeft - (x - startX) * 1.5;
+});
+
+const dots = document.querySelectorAll('.how-dot');
+const cardW = 340 + 24;
+function updateDots() {
+  const idx = Math.round(track.scrollLeft / cardW);
+  dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+}
+track.addEventListener('scroll', updateDots, { passive: true });
+document.getElementById('how-prev').onclick = () => track.scrollBy({ left: -cardW, behavior: 'smooth' });
+document.getElementById('how-next').onclick = () => track.scrollBy({ left: cardW, behavior: 'smooth' });
+
+// ── PIXEL GRID ANIMATION (disabled — stego removed) ──
+(function(){ return;
+  const grid = document.getElementById('pixel-grid');
+  const label = document.getElementById('pixel-label');
+  const base = [
+    [82,120,95],[95,140,110],[70,105,80],[110,155,120],[90,130,100],
+    [200,180,140],[185,165,120],[210,195,155],[175,155,110],[195,175,135],
+    [130,160,200],[115,145,185],[145,175,210],[120,150,190],[135,165,205],
+    [180,140,100],[165,125,90],[195,155,115],[170,130,95],[185,145,105],
+  ];
+  const pixels = Array.from({length:100}, (_,i) => {
+    const c = base[i % base.length];
+    const j = () => Math.floor((Math.random()-.5)*18);
+    return [c[0]+j(), c[1]+j(), c[2]+j()];
+  });
+  function render(mod) {
+    grid.innerHTML = '';
+    pixels.forEach((c, i) => {
+      const d = document.createElement('div');
+      d.className = 'pixel';
+      if (mod && i < 40) {
+        const b = c[2] % 2 === 0 ? c[2]+1 : c[2]-1;
+        d.style.background = `rgb(${c[0]},${c[1]},${b})`;
+        if (i < 24) d.style.outline = '1px solid rgba(59,130,246,.65)';
+      } else {
+        d.style.background = `rgb(${c[0]},${c[1]},${c[2]})`;
+      }
+      grid.appendChild(d);
+    });
+  }
+  render(false);
+  let tog = false;
+  setInterval(() => { tog = !tog; render(tog); label.textContent = tog ? 'IMAGEN CON MENSAJE OCULTO (LSB)' : 'IMAGEN ORIGINAL'; }, 2500);
+})();
+</script>
+
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accentColor": "#3b82f6",
+  "trailCount": 28,
+  "heroTitle": "Mensajería que el servidor no puede leer"
+}/*EDITMODE-END*/;
+
+function TweaksApp() {
+  const result = useTweaks(TWEAK_DEFAULTS);
+  if (!result) return null;
+  const { tweaks, setTweak } = result;
+  if (!tweaks) return null;
+
+  React.useEffect(() => {
+    document.documentElement.style.setProperty('--accent', tweaks.accentColor);
+    document.documentElement.style.setProperty('--accent-dim', tweaks.accentColor + '1f');
+    document.documentElement.style.setProperty('--accent-glow', tweaks.accentColor + '4d');
+  }, [tweaks.accentColor]);
+
+  return (
+    <TweaksPanel title="Tweaks">
+      <TweakColor label="Color de acento" value={tweaks.accentColor} onChange={v => setTweak('accentColor', v)} />
+      <TweakText label="Título principal" value={tweaks.heroTitle} onChange={v => {
+        setTweak('heroTitle', v);
+        const h1 = document.querySelector('#hero h1');
+        if (h1) h1.innerHTML = v;
+      }} />
+    </TweaksPanel>
+  );
+}
+
+const tweaksRoot = document.createElement('div');
+document.body.appendChild(tweaksRoot);
+ReactDOM.createRoot(tweaksRoot).render(<TweaksApp />);
+</script>
+
+
+<script>
+// ── TERM TOOLTIP ENGINE ──────────────────────────────────────────────────────
+(function(){
+  const box = document.createElement('div');
+  box.className = 'term-tooltip';
+  box.innerHTML = '<span class="tip-label"></span><span class="tip-body"></span>';
+  document.body.appendChild(box);
+
+  let typeTimer = null;
+
+  document.querySelectorAll('.term').forEach(el => {
+    el.addEventListener('mouseenter', e => {
+      box.querySelector('.tip-label').textContent = el.dataset.label;
+      const body = box.querySelector('.tip-body');
+      body.innerHTML = '';
+      box.classList.add('visible');
+      positionBox(e);
+
+      clearInterval(typeTimer);
+      const txt = el.dataset.tip || '';
+      let i = 0;
+      body.innerHTML = '<span class="tip-cursor"></span>';
+      typeTimer = setInterval(() => {
+        if (i >= txt.length) { clearInterval(typeTimer); return; }
+        body.textContent = txt.slice(0, ++i);
+        const cur = document.createElement('span');
+        cur.className = 'tip-cursor';
+        body.appendChild(cur);
+      }, 16);
+    });
+
+    el.addEventListener('mousemove', positionBox);
+    el.addEventListener('mouseleave', () => {
+      box.classList.remove('visible');
+      clearInterval(typeTimer);
+    });
+  });
+
+  function positionBox(e) {
+    const pad = 14, w = 280, h = 130;
+    let x = e.clientX + pad;
+    let y = e.clientY + pad;
+    if (x + w > window.innerWidth)  x = e.clientX - w - pad;
+    if (y + h > window.innerHeight) y = e.clientY - h - pad;
+    box.style.left = x + 'px';
+    box.style.top  = y + 'px';
+  }
+})();
+</script>
+
+</body>
+</html>
