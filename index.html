@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Hermnet — Mensajería <span class="term" data-label="Zero-Knowledge" data-tip="El servidor aprende cero información sobre el contenido. Matemáticamente, aunque lo quisiese, es incapaz de descifrar lo que transmite.">Zero-Knowledge</span></title>
+<title>Hermnet — Mensajería Zero-Knowledge</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -190,8 +190,24 @@ h1 em { font-style: normal; color: var(--accent); }
 }
 .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,.18); transform: translateY(-3px); }
 
+.hero-video {
+  width: min(920px, 88vw);
+  margin-top: 2.2rem;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 18px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 28px 90px rgba(0,0,0,.38), 0 0 55px rgba(59,130,246,.14);
+}
+.hero-video video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
 .hero-scroll-hint {
-  margin-top: 5rem; color: var(--muted); font-size: .7rem;
+  margin-top: 3.2rem; color: var(--muted); font-size: .7rem;
   letter-spacing: .14em; display: flex; flex-direction: column; align-items: center; gap: 10px;
   animation: scrollBounce 2.8s ease-in-out infinite;
   font-family: var(--font-body);
@@ -250,7 +266,7 @@ h2 em { font-style: normal; color: var(--accent); }
     scroll-snap-type: none;
   }
   .step-card { flex: unset; }
-  #how-nav { display: none; }
+  .how-nav { display: none; }
 }
 .how-track::-webkit-scrollbar { display: none; }
 .how-track.grabbing { cursor: grabbing; }
@@ -582,6 +598,265 @@ footer p { font-size: .73rem; color: var(--muted); }
   margin-bottom: .5rem;
 }
 .stat-label { color: var(--steel); font-size: .8rem; line-height: 1.6; }
+
+@media (max-width: 980px) {
+  nav {
+    height: 62px;
+    padding: 0 4.5vw;
+  }
+  .nav-links { display: none; }
+  .nav-logo img { height: 26px; }
+  .nav-logo span { font-size: .82rem; }
+  .nav-cta {
+    padding: .42rem .9rem;
+    font-size: .74rem;
+  }
+  #hero {
+    min-height: auto;
+    padding: 96px 5vw 64px;
+  }
+  .hero-logo-wrap { margin-bottom: 1.7rem; }
+  .hero-logo-wrap img { width: min(300px, 66vw); }
+  .hero-ring { inset: -32px; }
+  .hero-ring-2 { inset: -62px; }
+  h1 {
+    font-size: clamp(2.45rem, 11vw, 4.4rem);
+    max-width: 720px;
+    margin-top: 1.7rem;
+  }
+  .hero-sub {
+    max-width: 620px;
+    font-size: .98rem;
+    line-height: 1.68;
+  }
+  .hero-video {
+    width: min(780px, 92vw);
+    border-radius: 14px;
+  }
+  #how,
+  #features,
+  #stego,
+  #audience,
+  #cta,
+  #screenshots,
+  #greenIT,
+  #ods,
+  #iros,
+  #origin,
+  #authors {
+    padding-top: 82px !important;
+    padding-bottom: 82px !important;
+  }
+  .features-grid,
+  .audience-grid,
+  .ods-grid,
+  .iro-grid,
+  .stats-row {
+    margin-top: 2.4rem;
+  }
+}
+
+@media (max-width: 640px) {
+  body { line-height: 1.58; }
+  .bg-glow {
+    background:
+      radial-gradient(ellipse 115vw 65vh at 50% 5%, rgba(59,130,246,.075) 0%, transparent 68%),
+      radial-gradient(ellipse 90vw 60vh at 85% 82%, rgba(6,182,212,.045) 0%, transparent 68%);
+  }
+  nav {
+    height: 58px;
+    padding: 0 18px;
+  }
+  .nav-logo { gap: 8px; }
+  .nav-logo img { height: 23px; }
+  .nav-logo span {
+    font-size: .78rem;
+    letter-spacing: .12em;
+  }
+  .nav-cta {
+    padding: .42rem .72rem;
+    border-radius: 7px;
+    font-size: .7rem;
+  }
+  #hero {
+    align-items: stretch;
+    padding: 82px 18px 56px;
+    text-align: left;
+  }
+  .hero-logo-wrap {
+    align-self: center;
+    margin-bottom: 1.2rem;
+  }
+  .hero-logo-wrap img {
+    width: min(230px, 64vw);
+    filter: drop-shadow(0 0 44px rgba(59,130,246,.46))
+            drop-shadow(0 0 85px rgba(6,182,212,.24));
+  }
+  .hero-ring { inset: -20px; }
+  .hero-ring-2 { inset: -42px; }
+  #hero > p:first-of-type {
+    text-align: center;
+    font-size: .68rem !important;
+    letter-spacing: .18em !important;
+  }
+  h1 {
+    font-size: clamp(2.2rem, 10.5vw, 3rem);
+    line-height: 1.04;
+    letter-spacing: -.02em;
+    max-width: 100%;
+    margin-top: 1.2rem;
+  }
+  .hero-sub {
+    max-width: 100%;
+    font-size: .96rem;
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+  .hero-ctas {
+    width: 100%;
+    flex-direction: column;
+    gap: .75rem;
+    margin-top: 2rem;
+  }
+  .btn-primary,
+  .btn-ghost {
+    width: 100%;
+    min-height: 48px;
+    padding: .82rem 1rem;
+    font-size: .9rem;
+  }
+  .hero-video {
+    width: 100%;
+    margin-top: 1.45rem;
+    border-radius: 12px;
+    box-shadow: 0 18px 60px rgba(0,0,0,.36), 0 0 34px rgba(59,130,246,.12);
+  }
+  .hero-scroll-hint { display: none; }
+  #how,
+  #features,
+  #stego,
+  #audience,
+  #cta,
+  #screenshots,
+  #greenIT,
+  #ods,
+  #iros,
+  #origin,
+  #authors {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+    padding-top: 68px !important;
+    padding-bottom: 68px !important;
+  }
+  #how {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .how-header {
+    padding: 0 18px;
+    margin-bottom: 1.7rem;
+  }
+  .how-track {
+    gap: .9rem;
+    padding: .5rem 18px 1.35rem;
+  }
+  .step-card {
+    flex-basis: min(300px, 82vw);
+    border-radius: 14px;
+    padding: 1.35rem;
+  }
+  .step-num {
+    font-size: 2.8rem;
+    margin-bottom: 1rem;
+  }
+  .how-nav {
+    padding: 0 18px;
+    margin-top: .6rem;
+  }
+  h2 {
+    font-size: clamp(1.9rem, 10vw, 2.65rem);
+    letter-spacing: -.015em;
+  }
+  .section-desc {
+    max-width: 100%;
+    font-size: .92rem;
+    line-height: 1.68;
+  }
+  .features-grid,
+  .audience-grid,
+  .ods-grid,
+  .iro-grid,
+  .stats-row {
+    grid-template-columns: 1fr;
+    gap: .9rem;
+    margin-top: 2rem;
+  }
+  .feat-card,
+  .aud-card,
+  .ods-card,
+  .iro-card,
+  .stat-block {
+    border-radius: 14px;
+    padding: 1.35rem;
+  }
+  .stego-inner {
+    grid-template-columns: 1fr;
+    gap: 2.2rem;
+  }
+  .bit-stream {
+    font-size: .6rem;
+    overflow-wrap: anywhere;
+  }
+  #cta {
+    text-align: left;
+  }
+  #cta h2,
+  #cta p {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .cta-tags {
+    justify-content: flex-start;
+    gap: .55rem;
+  }
+  .cta-tag {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .phone-frame {
+    width: min(168px, 44vw);
+    height: 292px;
+    border-radius: 24px;
+  }
+  .phone-tall { height: 330px; }
+  .phone-tallest { height: 370px; }
+  .phone-label {
+    bottom: -1.55rem;
+    font-size: .62rem;
+  }
+  footer {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.8rem 18px;
+  }
+  footer p {
+    max-width: 100%;
+    line-height: 1.55;
+  }
+  .term-tooltip {
+    max-width: min(280px, calc(100vw - 28px));
+  }
+}
+
+@media (max-width: 380px) {
+  .nav-logo span { display: none; }
+  h1 { font-size: clamp(2.05rem, 10.2vw, 2.55rem); }
+  .step-card { flex-basis: min(284px, 84vw); }
+  .phone-frame {
+    width: min(160px, 82vw);
+  }
+}
 </style>
 </head>
 <body>
@@ -620,6 +895,13 @@ footer p { font-size: .73rem; color: var(--muted); }
   <div class="hero-ctas cin cin-d4">
     <button class="btn-primary" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">Descargar para Android</button>
     <button class="btn-ghost" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">Ver cómo funciona</button>
+  </div>
+
+  <div class="hero-video cin cin-d4" aria-label="Video promocional de Hermnet">
+    <video controls preload="metadata" playsinline>
+      <source src="assets/hermnet-ad.mp4" type="video/mp4" />
+      Tu navegador no puede reproducir este video.
+    </video>
   </div>
 
   <div class="hero-scroll-hint">
