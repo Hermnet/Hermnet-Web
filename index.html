@@ -4,12 +4,14 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Hermnet — Mensajería Zero-Knowledge</title>
+<link rel="icon" type="image/png" href="assets/logo-new.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -37,6 +39,7 @@ body {
   overflow-x: hidden;
   line-height: 1.65;
 }
+.step-icon i, .feat-icon i, .aud-icon i { color: var(--accent); width: 24px; height: 24px; }
 
 /* ── CANVAS ── */
 #bg-canvas {
@@ -861,7 +864,7 @@ footer p { font-size: .73rem; color: var(--muted); }
 </head>
 <body>
 
-<canvas id="bg-canvas" style="display:none"></canvas>
+<canvas id="bg-canvas"></canvas>
 <div class="bg-glow"></div>
 
 <nav id="main-nav">
@@ -887,13 +890,10 @@ footer p { font-size: .73rem; color: var(--muted); }
     <div class="hero-ring-2"></div>
     <img src="assets/logo-new.png" alt="Hermnet" />
   </div>
-
-  <p class="cin cin-d2" style="font-family:var(--font-display);font-size:clamp(.75rem,1.2vw,.9rem);font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem">Solo para Android</p>
-  <h1 class="cin cin-d2">Privacidad absoluta.<br/><em>Sin compromisos.</em></h1>
-  <p class="hero-sub cin cin-d3" style="margin-top:1.8rem">Sin teléfono. Sin email. Sin contraseñas. Tus mensajes viajan cifrados de extremo a extremo — el servidor solo ve datos opacos que no puede descifrar.</p>
+  <h1 class="cin cin-d2">Tú tienes el control.<br/><em>Privacidad real.</em></h1>
+  <p class="hero-sub cin cin-d3" style="margin-top:1.8rem">Sin número de teléfono. Sin email. Sin cuentas. Hermnet está diseñado para que solo tú y tus contactos podáis leer vuestros mensajes. Nadie más, ni siquiera nosotros, puede acceder a tus datos.</p>
 
   <div class="hero-ctas cin cin-d4">
-    <button class="btn-primary" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">Descargar para Android</button>
     <button class="btn-ghost" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">Ver cómo funciona</button>
   </div>
 
@@ -915,43 +915,43 @@ footer p { font-size: .73rem; color: var(--muted); }
   <div class="how-header">
     <div class="section-label cin">El flujo</div>
     <h2 class="cin cin-d1">Funciona así.</h2>
-    <p class="section-desc cin cin-d2">Cinco pasos. Ninguno revela quién eres, qué dices, ni con quién hablas.</p>
+    <p class="section-desc cin cin-d2">Cinco pasos pensados para que tengas el control de principio a fin.</p>
   </div>
   <div class="how-track" id="how-track">
     <div class="step-card">
       <div class="step-num">01</div>
-      <div class="step-icon">🔑</div>
-      <h3>Tu Pasaporte Digital</h3>
-      <p>Tu móvil genera un par de claves <span class="term" data-label="Ed25519" data-tip="Algoritmo de firma digital ultrarrápido basado en curvas elípticas. Genera identidades criptográficas compactas y muy seguras.">Ed25519</span> localmente. La clave privada nunca sale del dispositivo. Ningún servidor la ve jamás.</p>
-      <span class="step-tag">Ed25519 · <span class="term" data-label="SecureStore" data-tip="Almacén cifrado del sistema operativo móvil (Android Keystore / iOS Secure Enclave). Guarda claves privadas protegidas por hardware, inaccesibles incluso si extraes el almacenamiento.">SecureStore</span></span>
+      <div class="step-icon"><i data-lucide="key"></i></div>
+      <h3>Tus Llaves Personales</h3>
+      <p>Al abrir la app, tu móvil crea unas "llaves" especiales de forma automática. Estas llaves son tu identidad y nunca salen de tu dispositivo, por lo que tú eres el único dueño.</p>
+      <span class="step-tag">Identidad Local · Control Total</span>
     </div>
     <div class="step-card">
       <div class="step-num">02</div>
-      <div class="step-icon">📲</div>
-      <h3>El Saludo Secreto</h3>
-      <p>Añades contactos escaneando su QR. Vuestros teléfonos intercambian claves públicas directamente. Ningún servidor registra la relación.</p>
-      <span class="step-tag">TOFU · QR · X25519</span>
+      <div class="step-icon"><i data-lucide="smartphone"></i></div>
+      <h3>Conexión Directa</h3>
+      <p>Añades a tus contactos escaneando su código en persona. Así, os conectáis directamente sin dejar ningún rastro en servidores externos de quién habla con quién.</p>
+      <span class="step-tag">Sin Intermediarios · Conexión Segura</span>
     </div>
     <div class="step-card">
       <div class="step-num">03</div>
-      <div class="step-icon">🔒</div>
-      <h3>El Sobre Sellado</h3>
-      <p>El mensaje se cifra con <span class="term" data-label="AES-256-GCM" data-tip="El estándar de cifrado simétrico más robusto del mundo. Usa una clave de 256 bits — probar todas las combinaciones llevaría más tiempo que la edad del universo.">AES-256-GCM</span>. La clave de sesión se envuelve con <span class="term" data-label="RSA-2048 OAEP" data-tip="Algoritmo de cifrado asimétrico. Tu clave pública cifra, solo tu clave privada descifra. El "2048" son los bits de seguridad; OAEP es el esquema de relleno que lo hace seguro."><span class="term" data-label="RSA-2048" data-tip="Sistema criptográfico basado en la dificultad matemática de factorizar números enormes. Con 2048 bits, romperlo tomaría millones de años con hardware actual.">RSA-2048</span> OAEP</span> del destinatario. El servidor recibe un blob binario opaco que no puede abrir.</p>
-      <span class="step-tag">AES-256-GCM · RSA-2048 OAEP</span>
+      <div class="step-icon"><i data-lucide="lock"></i></div>
+      <h3>Mensajes Blindados</h3>
+      <p>Cada vez que envías un mensaje, este se encierra en una "caja fuerte" digital. Solo el teléfono de la persona a la que escribes tiene la llave para abrir esa caja y leer el mensaje.</p>
+      <span class="step-tag">Cifrado de Extremo a Extremo</span>
     </div>
     <div class="step-card">
       <div class="step-num">04</div>
-      <div class="step-icon">🔔</div>
-      <h3>La Alarma Silenciosa</h3>
-      <p>Recibes una notificación vacía. Tu app descarga el <span class="term" data-label="Payload" data-tip="El contenido cifrado que viaja por la red. En Hermnet, es un blob binario opaco: el servidor no puede saber qué hay dentro.">payload</span> cifrado, lo descifra localmente con tu clave privada RSA. Google y Apple nunca ven el contenido.</p>
-      <span class="step-tag">Blind Push · FCM · RSA-SHA256</span>
+      <div class="step-icon"><i data-lucide="bell"></i></div>
+      <h3>Entrega Silenciosa</h3>
+      <p>Cuando recibes algo, tu teléfono recoge la caja cerrada y la abre en privado. Ni la red ni el servidor saben qué hay dentro de esa caja en ningún momento.</p>
+      <span class="step-tag">Privacidad Absoluta</span>
     </div>
     <div class="step-card">
       <div class="step-num">05</div>
-      <div class="step-icon">🔒</div>
-      <h3>La Caja Fuerte</h3>
-      <p>Tu historial vive en <span class="term" data-label="SQLite" data-tip="Base de datos ligera que vive directamente en tu dispositivo. En Hermnet, todos tus mensajes se guardan aquí, cifrados, sin pasar por ningún servidor.">SQLite</span> cifrada solo en tu dispositivo. Un archivo .hnet protegido te permite recuperar todo en un móvil nuevo.</p>
-      <span class="step-tag">SQLite · .hnet · AES-GCM</span>
+      <div class="step-icon"><i data-lucide="shield-check"></i></div>
+      <h3>Tu Propia Bóveda</h3>
+      <p>Tus conversaciones se guardan únicamente en la memoria de tu móvil, protegidas para que solo tú puedas verlas. Tú decides qué guardar y qué borrar.</p>
+      <span class="step-tag">Tus Datos · Tus Reglas</span>
     </div>
   </div>
   <div class="how-nav">
@@ -970,44 +970,44 @@ footer p { font-size: .73rem; color: var(--muted); }
 <!-- ═══ FEATURES ═══ -->
 <section id="features">
   <div class="section-label cin">Seguridad</div>
-  <h2 class="cin cin-d1">Cada capa.<br/><em>Impenetrable.</em></h2>
-  <p class="section-desc cin cin-d2">Diseñado desde cero para que ni siquiera nosotros podamos leer tus mensajes.</p>
+  <h2 class="cin cin-d1">Diseñada para protegerte.<br/><em>Siempre.</em></h2>
+  <p class="section-desc cin cin-d2">Nuestra prioridad es que tengas la tranquilidad de que nadie espía tus conversaciones.</p>
   <div class="features-grid">
     <div class="feat-card cin">
-      <div class="feat-icon">🛡️</div>
-      <h3>Zero-Knowledge</h3>
-      <p>El servidor solo almacena blobs binarios cifrados. No conoce el remitente, el destinatario, ni el contenido de ningún mensaje.</p>
-      <div class="feat-mono">server_knowledge = ∅</div>
+      <div class="feat-icon"><i data-lucide="shield-off"></i></div>
+      <h3>Nosotros no sabemos nada</h3>
+      <p>Nuestro servidor actúa como un simple mensajero ciego. No sabe quién envía, quién recibe, ni mucho menos qué pone en el mensaje.</p>
+      <div class="feat-mono">Privacidad por diseño</div>
     </div>
     <div class="feat-card cin cin-d1">
-      <div class="feat-icon">🔐</div>
-      <h3>Cifrado Híbrido <span class="term" data-label="End-to-End Encryption" data-tip="Cifrado de extremo a extremo: el mensaje se cifra en tu dispositivo y solo se descifra en el del destinatario. Nadie en el medio puede leerlo.">E2EE</span></h3>
-      <p><span class="term" data-label="AES-256-GCM" data-tip="El estándar de cifrado simétrico más robusto del mundo. Usa una clave de 256 bits — probar todas las combinaciones llevaría más tiempo que la edad del universo.">AES-256-GCM</span> cifra el contenido. <span class="term" data-label="RSA-2048 OAEP" data-tip="Algoritmo de cifrado asimétrico. Tu clave pública cifra, solo tu clave privada descifra.">RSA-2048 OAEP</span> envuelve la clave de sesión. Doble cerrojo: solo el destinatario puede abrir.</p>
-      <div class="feat-mono">AES-256-GCM + RSA-2048 OAEP</div>
+      <div class="feat-icon"><i data-lucide="lock-keyhole"></i></div>
+      <h3>Cifrado Total</h3>
+      <p>Usamos tecnología de seguridad avanzada. Es como ponerle un candado irrompible a cada palabra que envías, garantizando que solo el destinatario pueda leerla.</p>
+      <div class="feat-mono">Máxima protección</div>
     </div>
     <div class="feat-card cin cin-d2">
-      <div class="feat-icon">👤</div>
-      <h3>Identidad Sin Registro</h3>
-      <p>Sin número de teléfono. Sin email. Tu identidad es un par de claves criptográficas generadas localmente.</p>
-      <div class="feat-mono">ID = SHA256(PK) → Base58</div>
+      <div class="feat-icon"><i data-lucide="user"></i></div>
+      <h3>Anonimato Real</h3>
+      <p>No te pedimos absolutamente ningún dato personal para usar la app. Eres libre de comunicarte sin revelar tu identidad al mundo.</p>
+      <div class="feat-mono">Sin registros</div>
     </div>
     <div class="feat-card cin cin-d3">
-      <div class="feat-icon">📦</div>
-      <h3>Tráfico Uniforme</h3>
-      <p>Todas las imágenes pesan exactamente lo mismo (~1.5 MB). El análisis de tráfico por tamaño de paquete es inútil.</p>
-      <div class="feat-mono">payload_size = const</div>
+      <div class="feat-icon"><i data-lucide="globe"></i></div>
+      <h3>Red Tor Integrada</h3>
+      <p>Tu conexión se camufla rebotando por la red Tor. Ni tu proveedor de internet sabe que usas la app, ni nosotros podemos saber desde dónde te conectas.</p>
+      <div class="feat-mono">Conexión invisible</div>
+    </div>
+    <div class="feat-card cin cin-d4">
+      <div class="feat-icon"><i data-lucide="package"></i></div>
+      <h3>Contra Espías</h3>
+      <p>Todos los mensajes que se envían por la red parecen exactamente iguales por fuera. Así, nadie puede adivinar si envías un "hola" o un documento importante.</p>
+      <div class="feat-mono">Tráfico camuflado</div>
     </div>
     <div class="feat-card cin cin-d1">
-      <div class="feat-icon">⏱️</div>
-      <h3>Buzón Efímero 48h</h3>
-      <p>El servidor borra los mensajes tras la entrega. No existe historial alguno del lado del servidor.</p>
-      <div class="feat-mono">TTL = 48h → purge()</div>
-    </div>
-    <div class="feat-card cin cin-d2">
-      <div class="feat-icon">💥</div>
-      <h3>Auto-Destrucción</h3>
-      <p>N intentos de PIN fallidos borran el keystore local automáticamente. Sin rastro. El dispositivo queda limpio.</p>
-      <div class="feat-mono">pin_fails ≥ N → wipe()</div>
+      <div class="feat-icon"><i data-lucide="zap"></i></div>
+      <h3>Botón del Pánico</h3>
+      <p>Si alguien intenta acceder a tu teléfono sin permiso, la app puede autodestruir todos los datos tras varios intentos fallidos, protegiéndote en situaciones de riesgo.</p>
+      <div class="feat-mono">Autoprotección</div>
     </div>
   </div>
 </section>
@@ -1017,35 +1017,36 @@ footer p { font-size: .73rem; color: var(--muted); }
   <div class="stego-inner">
     <div>
       <div class="section-label cin">Tecnología</div>
-      <h2 class="cin cin-d1">Un payload.<br/><em>Nadie lo abre.</em></h2>
-      <p class="section-desc cin cin-d2">El servidor recibe un blob binario cifrado. Sin metadatos, sin contexto. Solo bytes que únicamente el destinatario puede descifrar.</p>
+      <h2 class="cin cin-d1">Seguridad que<br/><em>no estorba.</em></h2>
+      <p class="section-desc cin cin-d2">Toda la magia ocurre en segundo plano. Tú solo te preocupas de escribir, mientras tu dispositivo hace todo el trabajo complejo para mantener tus datos a salvo.</p>
       <div class="stego-steps cin cin-d3">
         <div class="stego-step">
           <div class="stego-step-num">1</div>
-          <p><strong>Envelope JSON</strong> — El mensaje se empaqueta con remitente, clave pública y timestamp.</p>
+          <p><strong>Escribes tu mensaje</strong> — Tal y como lo harías en cualquier otra aplicación de chat.</p>
         </div>
         <div class="stego-step">
           <div class="stego-step-num">2</div>
-          <p><strong>AES-256-GCM</strong> — El envelope JSON se cifra con una clave de sesión aleatoria de 32 bytes + IV + authTag.</p>
+          <p><strong>Tu teléfono lo cifra</strong> — Al momento, el texto se convierte en un galimatías indescifrable.</p>
         </div>
         <div class="stego-step">
           <div class="stego-step-num">3</div>
-          <p><strong>RSA-2048 OAEP</strong> — La clave de sesión se cifra con la clave pública RSA del destinatario.</p>
+          <p><strong>Viaja seguro</strong> — Ese código viaja por internet. Si alguien lo intercepta, solo verá ruido y caracteres sin sentido.</p>
         </div>
         <div class="stego-step">
           <div class="stego-step-num">4</div>
-          <p><strong>Blob opaco</strong> — El payload se envía como base64 al servidor. Ningún intermediario puede leerlo.</p>
+          <p><strong>Solo tu contacto lo lee</strong> — Al llegar a su destino, el teléfono de tu amigo usa su llave única para convertir ese ruido de vuelta en tu mensaje original.</p>
         </div>
       </div>
     </div>
     <div class="cin cin-d1">
-      <div class="pixel-grid" id="pixel-grid"></div>
-      <div class="stego-label" id="pixel-label">IMAGEN ORIGINAL</div>
-      <div class="bit-stream">
-        10110010 11001010 10101100<br/>
-        01101001 <span class="b1">1</span>0110100 1<span class="b1">1</span>01001<span class="b1">0</span><br/>
-        1<span class="b1">1</span>0<span class="b1">0</span>101<span class="b1">0</span> 10<span class="b1">1</span>10011 01001101<br/>
-        <span style="color:var(--muted);font-size:.6rem">↑ bits LSB modificados (marcados en azul)</span>
+      <div style="background:var(--surface2); border:1px solid var(--border); border-radius:14px; padding:2rem; text-align:center;">
+        <div style="margin-bottom:1rem; display:flex; justify-content:center;"><i data-lucide="shield-check" style="width:48px;height:48px;color:var(--accent);"></i></div>
+        <div style="font-family:var(--font-display); font-size:1.2rem; font-weight:700; color:var(--text);">Tus datos te pertenecen</div>
+        <p style="color:var(--steel); font-size:.85rem; line-height:1.6; margin-top:.8rem;">
+          No vendemos tu información.<br/>
+          No leemos tus mensajes.<br/>
+          No sabemos quiénes son tus amigos.
+        </p>
       </div>
     </div>
   </div>
@@ -1060,22 +1061,22 @@ footer p { font-size: .73rem; color: var(--muted); }
   </div>
   <div class="audience-grid">
     <div class="aud-card cin">
-      <div class="aud-icon">📰</div>
+      <div class="aud-icon"><i data-lucide="newspaper"></i></div>
       <h3>Periodistas</h3>
       <p>Protege fuentes confidenciales bajo regímenes que vigilan el tráfico de mensajería convencional.</p>
     </div>
     <div class="aud-card cin cin-d1">
-      <div class="aud-icon">✊</div>
+      <div class="aud-icon"><i data-lucide="megaphone"></i></div>
       <h3>Activistas</h3>
       <p>Coordina acciones sin dejar rastro de metadatos. Sin grafo social. Sin historial en servidores.</p>
     </div>
     <div class="aud-card cin cin-d2">
-      <div class="aud-icon">🔬</div>
+      <div class="aud-icon"><i data-lucide="microscope"></i></div>
       <h3>Investigadores de Seguridad</h3>
       <p>Comunica hallazgos sensibles de vulnerabilidades de forma completamente privada.</p>
     </div>
     <div class="aud-card cin cin-d3">
-      <div class="aud-icon">⚖️</div>
+      <div class="aud-icon"><i data-lucide="scale"></i></div>
       <h3>Abogados y Médicos</h3>
       <p>Protege la confidencialidad profesional con un canal de privilegio absoluto.</p>
     </div>
@@ -1084,16 +1085,13 @@ footer p { font-size: .73rem; color: var(--muted); }
 
 <!-- ═══ CTA ═══ -->
 <section id="cta">
-  <div class="section-label cin" style="text-align:center">Descarga</div>
+  <div class="section-label cin" style="text-align:center">Acceso</div>
   <h2 class="cin cin-d1">Tu privacidad.<br/><em>Empieza hoy.</em></h2>
   <p class="cin cin-d2">Abre la app. Genera tu identidad. Listo. Sin formularios, sin verificaciones, sin cuentas.</p>
-  <div class="cin cin-d3" style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2rem">
-    <button class="btn-primary">Descargar para Android</button>
-  </div>
   <div class="cta-tags cin cin-d4">
-    <span class="cta-tag">AES-256-GCM</span>
-    <span class="cta-tag">RSA-2048 OAEP</span>
-    <span class="cta-tag">Zero-Knowledge</span>
+    <span class="cta-tag">Cifrado Total</span>
+    <span class="cta-tag">Protección Máxima</span>
+    <span class="cta-tag">Privacidad Absoluta</span>
     <span class="cta-tag">ODS 5 · 9 · 10 · 12 · 13 · 16</span>
     <span class="cta-tag">Green IT −95%</span>
     <span class="cta-tag">Open Source</span>
@@ -1130,7 +1128,7 @@ footer p { font-size: .73rem; color: var(--muted); }
           <span style="font-family:var(--font-display);font-size:.78rem;font-weight:700;color:#e8edf5">Chats</span>
           <div style="width:22px;height:22px;border-radius:50%;background:rgba(59,130,246,.15);display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#3b82f6">+</div>
         </div>
-        <div style="background:rgba(255,255,255,.04);border-radius:7px;padding:.4rem .6rem;font-size:.58rem;color:#3d4f65">🔍 Buscar…</div>
+        <div style="background:rgba(255,255,255,.04);border-radius:7px;padding:.4rem .6rem;font-size:.58rem;color:#3d4f65;display:flex;align-items:center;gap:4px;"><i data-lucide="search" style="width:10px;height:10px;"></i> Buscar…</div>
         <div style="display:flex;flex-direction:column;gap:.5rem;margin-top:.2rem;">
           <div style="display:flex;gap:.55rem;align-items:center">
             <div style="width:28px;height:28px;border-radius:50%;background:rgba(59,130,246,.2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:#3b82f6">Á</div>
@@ -1152,7 +1150,7 @@ footer p { font-size: .73rem; color: var(--muted); }
           </div>
         </div>
         <div style="margin-top:auto;display:flex;justify-content:flex-end;">
-          <div style="width:32px;height:32px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;font-size:.85rem;box-shadow:0 0 14px rgba(59,130,246,.4)">🛡️</div>
+          <div style="width:32px;height:32px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(59,130,246,.4)"><i data-lucide="shield" style="width:16px;height:16px;color:#fff;"></i></div>
         </div>
       </div>
       <div class="phone-label">Lista de Chats</div>
@@ -1163,7 +1161,7 @@ footer p { font-size: .73rem; color: var(--muted); }
       <div class="phone-notch"></div>
       <div class="phone-screen" style="display:flex;flex-direction:column;padding:.75rem .8rem;gap:.45rem;">
         <div style="display:flex;align-items:center;gap:.45rem;padding-bottom:.3rem;border-bottom:1px solid rgba(255,255,255,.05)">
-          <span style="color:#3b82f6;font-size:.65rem">&#8592;</span>
+          <i data-lucide="arrow-left" style="width:14px;height:14px;color:#3b82f6;"></i>
           <div style="width:22px;height:22px;border-radius:50%;background:rgba(59,130,246,.2);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;color:#3b82f6">Á</div>
           <span style="font-size:.65rem;font-weight:600;color:#e8edf5">Álvaro</span>
           <span style="margin-left:auto;font-size:.5rem;color:#3d4f65">E2EE ✓</span>
@@ -1182,13 +1180,13 @@ footer p { font-size: .73rem; color: var(--muted); }
             <div style="font-size:.46rem;color:#3d4f65;margin-top:.15rem">12:09 · E2EE ✓</div>
           </div>
           <div style="align-self:flex-end;background:rgba(59,130,246,.2);border-radius:10px 10px 2px 10px;padding:.4rem .6rem;max-width:78%;">
-            <div style="font-size:.56rem;color:#e8edf5">👍</div>
+            <div style="font-size:.56rem;color:#e8edf5"><i data-lucide="thumbs-up" style="width:12px;height:12px;"></i></div>
             <div style="font-size:.46rem;color:#3d4f65;margin-top:.15rem">12:11 · ✓✓</div>
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:.45rem;background:rgba(255,255,255,.05);border-radius:18px;padding:.35rem .6rem;">
           <span style="font-size:.52rem;color:#3d4f65;flex:1">Escribe un mensaje…</span>
-          <div style="width:20px;height:20px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;font-size:.55rem">&#8593;</div>
+          <div style="width:20px;height:20px;border-radius:50%;background:#3b82f6;display:flex;align-items:center;justify-content:center;"><i data-lucide="arrow-up" style="width:12px;height:12px;color:#fff;"></i></div>
         </div>
       </div>
       <div class="phone-label">Chat Individual</div>
@@ -1212,7 +1210,7 @@ footer p { font-size: .73rem; color: var(--muted); }
         </div>
         <div style="font-size:.52rem;color:#3d4f65;font-family:monospace">HNET-7a2b-91zM</div>
         <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.18);border-radius:8px;padding:.45rem .7rem;text-align:center;">
-          <div style="font-size:.52rem;color:#ef4444;font-weight:600">&#9888; ¿Compartir tu QR?</div>
+          <div style="font-size:.52rem;color:#ef4444;font-weight:600;display:flex;align-items:center;justify-content:center;gap:4px;"><i data-lucide="alert-triangle" style="width:10px;height:10px;"></i> ¿Compartir tu QR?</div>
         </div>
         <div style="background:rgba(59,130,246,.18);color:#3b82f6;font-size:.58rem;font-weight:600;padding:.38rem .95rem;border-radius:6px;">Confirmar</div>
       </div>
@@ -1226,16 +1224,16 @@ footer p { font-size: .73rem; color: var(--muted); }
         <div style="font-family:var(--font-display);font-size:.78rem;font-weight:700;color:#e8edf5;margin-bottom:.3rem">Ajustes</div>
         <div style="font-size:.5rem;color:#3d4f65;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.1rem">Cuenta</div>
         <div style="background:rgba(255,255,255,.04);border-radius:8px;overflow:hidden">
-          <div style="padding:.45rem .65rem;font-size:.58rem;color:#e8edf5;border-bottom:1px solid rgba(255,255,255,.04)">🔑 Mi identidad</div>
-          <div style="padding:.45rem .65rem;font-size:.58rem;color:#e8edf5">📦 Exportar .hnet</div>
+          <div style="padding:.45rem .65rem;font-size:.58rem;color:#e8edf5;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:6px;"><i data-lucide="key" style="width:12px;height:12px;color:var(--accent);"></i> Mi identidad</div>
+          <div style="padding:.45rem .65rem;font-size:.58rem;color:#e8edf5;display:flex;align-items:center;gap:6px;"><i data-lucide="package" style="width:12px;height:12px;color:var(--accent);"></i> Exportar .hnet</div>
         </div>
         <div style="font-size:.5rem;color:#3d4f65;text-transform:uppercase;letter-spacing:.1em;margin:.25rem 0 .1rem">Seguridad</div>
         <div style="background:rgba(255,255,255,.04);border-radius:8px;overflow:hidden">
-          <div style="padding:.45rem .65rem;font-size:.58rem;color:#e8edf5;border-bottom:1px solid rgba(255,255,255,.04)">🛡️ PIN / Biometría</div>
-          <div style="padding:.45rem .65rem;font-size:.58rem;color:#e8edf5">🔔 Notificaciones</div>
+          <div style="padding:.45rem .65rem;font-size:.58rem;color:#e8edf5;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:6px;"><i data-lucide="shield" style="width:12px;height:12px;color:var(--accent);"></i> PIN / Biometría</div>
+          <div style="padding:.45rem .65rem;font-size:.58rem;color:#e8edf5;display:flex;align-items:center;gap:6px;"><i data-lucide="bell" style="width:12px;height:12px;color:var(--accent);"></i> Notificaciones</div>
         </div>
         <div style="font-size:.5rem;color:#3d4f65;text-transform:uppercase;letter-spacing:.1em;margin:.25rem 0 .1rem">Peligro</div>
-        <div style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.14);border-radius:8px;padding:.45rem .65rem;font-size:.58rem;color:#ef4444">🗑 Eliminar cuenta</div>
+        <div style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.14);border-radius:8px;padding:.45rem .65rem;font-size:.58rem;color:#ef4444;display:flex;align-items:center;gap:6px;"><i data-lucide="trash-2" style="width:12px;height:12px;"></i> Eliminar cuenta</div>
       </div>
       <div class="phone-label">Ajustes</div>
     </div>
@@ -1283,7 +1281,7 @@ footer p { font-size: .73rem; color: var(--muted); }
 
     <div class="ods-card cin" style="border-color:rgba(0,122,61,.3)">
       <div class="ods-num" style="color:#009f3d">16</div>
-      <h3>Paz, Justicia e Instituciones Sólidas ⭐</h3>
+      <h3 style="display:flex;align-items:center;gap:6px;">Paz, Justicia e Instituciones Sólidas <i data-lucide="star" style="width:16px;height:16px;color:#fbbf24;fill:#fbbf24;"></i></h3>
       <p>Las comunicaciones cifradas E2EE son infraestructura para el ejercicio de la libertad de expresión, especialmente en regímenes autoritarios. Protege a periodistas, activistas y denunciantes.</p>
       <span class="ods-tag" style="background:rgba(0,159,61,.12);color:#009f3d">Alineación principal</span>
     </div>
@@ -1416,17 +1414,17 @@ footer p { font-size: .73rem; color: var(--muted); }
     <img src="assets/logo-new.png" alt="Hermnet" />
     <span>HERMNET</span>
   </div>
-  <p>Hecho con ♥ por <a href="https://github.com/franciscorodalf" target="_blank" style="color:var(--accent);text-decoration:none">@franciscorodalf</a> &amp; <a href="https://github.com/alvarogrlp" target="_blank" style="color:var(--accent);text-decoration:none">@alvarogrlp</a></p>
+  <p>Hecho con <i data-lucide="heart" style="width:12px;height:12px;color:#ef4444;fill:#ef4444;vertical-align:middle;margin:0 2px;"></i> por <a href="https://github.com/franciscorodalf" target="_blank" style="color:var(--accent);text-decoration:none">@franciscorodalf</a> &amp; <a href="https://github.com/alvarogrlp" target="_blank" style="color:var(--accent);text-decoration:none">@alvarogrlp</a></p>
 </footer>
 
 <!-- ══════════════════════════════════════════════
      SCRIPTS
 ══════════════════════════════════════════════ -->
 <script>
-// ── LIGHT TRAILS CANVAS (disabled — using CSS glow) ──────────────────────────
+// ── NEURAL NETWORK PULSE ANIMATION ───────────────────────────────────────────
 (function(){
-  return; // replaced by .bg-glow CSS
   const canvas = document.getElementById('bg-canvas');
+  if (!canvas) return;
   const ctx = canvas.getContext('2d');
   let W, H;
 
@@ -1437,106 +1435,70 @@ footer p { font-size: .73rem; color: var(--muted); }
   resize();
   window.addEventListener('resize', resize);
 
-  // Comets / light trails
-  const TRAIL_LEN = 60;
-  const comets = [];
-
-  function makeComet() {
-    const angle = Math.random() * Math.PI * 2;
-    const speed = 0.6 + Math.random() * 1.4;
-    const hue = Math.random() < 0.7 ? 210 + Math.random() * 30 : 185 + Math.random() * 20; // blue/cyan
-    return {
+  const numNodes = 60;
+  const nodes = [];
+  for(let i=0; i<numNodes; i++) {
+    nodes.push({
       x: Math.random() * W,
       y: Math.random() * H,
-      vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed,
-      trail: [],
-      hue,
-      sat: 70 + Math.random() * 30,
-      bright: 55 + Math.random() * 30,
-      alpha: 0.4 + Math.random() * 0.5,
-      size: 0.8 + Math.random() * 1.6,
-      life: 1,
-    };
+      vx: (Math.random() - 0.5) * 0.6,
+      vy: (Math.random() - 0.5) * 0.6,
+      pulseTimer: Math.random() * 400, // Random start phase
+      radius: Math.random() * 1.5 + 0.8
+    });
   }
 
-  for (let i = 0; i < 28; i++) comets.push(makeComet());
-
-  // Static dim "star" nodes
-  const nodes = Array.from({length: 60}, () => ({
-    x: Math.random() * window.innerWidth,
-    y: Math.random() * window.innerHeight,
-    r: Math.random() * 1.2,
-    alpha: 0.08 + Math.random() * 0.14,
-  }));
-
-  function drawFrame() {
+  function draw() {
     ctx.clearRect(0, 0, W, H);
 
-    // Dim nodes
-    nodes.forEach(n => {
-      ctx.beginPath();
-      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(120,160,255,${n.alpha})`;
-      ctx.fill();
-    });
+    for(let i=0; i<numNodes; i++) {
+      let n = nodes[i];
+      n.x += n.vx;
+      n.y += n.vy;
 
-    // Connections between nearby nodes
-    for (let i = 0; i < nodes.length; i++) {
-      for (let j = i+1; j < nodes.length; j++) {
-        const d = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y);
-        if (d < 120) {
+      // Bounce off walls smoothly
+      if(n.x < 0 || n.x > W) n.vx *= -1;
+      if(n.y < 0 || n.y > H) n.vy *= -1;
+
+      n.pulseTimer++;
+      // Emit a pulse every 400 frames, lasting 60 frames
+      let isPulsing = (n.pulseTimer % 400) < 60;
+      let pulseIntensity = isPulsing ? Math.sin((n.pulseTimer % 400) / 60 * Math.PI) : 0;
+
+      // Draw node
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.radius + pulseIntensity * 1.5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(59,130,246,${0.2 + pulseIntensity * 0.8})`;
+      ctx.fill();
+
+      // Draw connections
+      for(let j=i+1; j<numNodes; j++) {
+        let n2 = nodes[j];
+        let dx = n.x - n2.x;
+        let dy = n.y - n2.y;
+        let dist = Math.sqrt(dx*dx + dy*dy);
+
+        if(dist < 160) {
           ctx.beginPath();
-          ctx.moveTo(nodes[i].x, nodes[i].y);
-          ctx.lineTo(nodes[j].x, nodes[j].y);
-          ctx.strokeStyle = `rgba(59,130,246,${0.04 * (1 - d/120)})`;
-          ctx.lineWidth = 0.5;
+          ctx.moveTo(n.x, n.y);
+          ctx.lineTo(n2.x, n2.y);
+
+          let alpha = (1 - dist/160) * 0.15;
+          if(isPulsing) {
+            // Pulse travels along the edges
+            alpha += pulseIntensity * 0.5 * (1 - dist/160);
+            ctx.strokeStyle = `rgba(6,182,212,${alpha})`;
+          } else {
+            ctx.strokeStyle = `rgba(59,130,246,${alpha})`;
+          }
+          ctx.lineWidth = 0.8 + (pulseIntensity * 0.5);
           ctx.stroke();
         }
       }
     }
-
-    // Comets
-    comets.forEach((c, idx) => {
-      c.trail.push({ x: c.x, y: c.y });
-      if (c.trail.length > TRAIL_LEN) c.trail.shift();
-
-      c.x += c.vx;
-      c.y += c.vy;
-
-      // Wrap or respawn
-      if (c.x < -80 || c.x > W + 80 || c.y < -80 || c.y > H + 80) {
-        comets[idx] = makeComet();
-        return;
-      }
-
-      // Draw trail as gradient line
-      if (c.trail.length < 2) return;
-      for (let i = 1; i < c.trail.length; i++) {
-        const t = i / c.trail.length;
-        const a = t * c.alpha * 0.8;
-        ctx.beginPath();
-        ctx.moveTo(c.trail[i-1].x, c.trail[i-1].y);
-        ctx.lineTo(c.trail[i].x, c.trail[i].y);
-        ctx.strokeStyle = `hsla(${c.hue},${c.sat}%,${c.bright}%,${a})`;
-        ctx.lineWidth = c.size * t;
-        ctx.lineCap = 'round';
-        ctx.stroke();
-      }
-
-      // Head glow
-      const grd = ctx.createRadialGradient(c.x, c.y, 0, c.x, c.y, c.size * 5);
-      grd.addColorStop(0, `hsla(${c.hue},100%,80%,${c.alpha})`);
-      grd.addColorStop(1, 'transparent');
-      ctx.beginPath();
-      ctx.arc(c.x, c.y, c.size * 5, 0, Math.PI * 2);
-      ctx.fillStyle = grd;
-      ctx.fill();
-    });
-
-    requestAnimationFrame(drawFrame);
+    requestAnimationFrame(draw);
   }
-  drawFrame();
+  draw();
 })();
 
 // ── NAV ───────────────────────────────────────────────────────────────────────
@@ -1606,40 +1568,7 @@ track.addEventListener('scroll', updateDots, { passive: true });
 document.getElementById('how-prev').onclick = () => track.scrollBy({ left: -cardW, behavior: 'smooth' });
 document.getElementById('how-next').onclick = () => track.scrollBy({ left: cardW, behavior: 'smooth' });
 
-// ── PIXEL GRID ANIMATION (disabled — stego removed) ──
-(function(){ return;
-  const grid = document.getElementById('pixel-grid');
-  const label = document.getElementById('pixel-label');
-  const base = [
-    [82,120,95],[95,140,110],[70,105,80],[110,155,120],[90,130,100],
-    [200,180,140],[185,165,120],[210,195,155],[175,155,110],[195,175,135],
-    [130,160,200],[115,145,185],[145,175,210],[120,150,190],[135,165,205],
-    [180,140,100],[165,125,90],[195,155,115],[170,130,95],[185,145,105],
-  ];
-  const pixels = Array.from({length:100}, (_,i) => {
-    const c = base[i % base.length];
-    const j = () => Math.floor((Math.random()-.5)*18);
-    return [c[0]+j(), c[1]+j(), c[2]+j()];
-  });
-  function render(mod) {
-    grid.innerHTML = '';
-    pixels.forEach((c, i) => {
-      const d = document.createElement('div');
-      d.className = 'pixel';
-      if (mod && i < 40) {
-        const b = c[2] % 2 === 0 ? c[2]+1 : c[2]-1;
-        d.style.background = `rgb(${c[0]},${c[1]},${b})`;
-        if (i < 24) d.style.outline = '1px solid rgba(59,130,246,.65)';
-      } else {
-        d.style.background = `rgb(${c[0]},${c[1]},${c[2]})`;
-      }
-      grid.appendChild(d);
-    });
-  }
-  render(false);
-  let tog = false;
-  setInterval(() => { tog = !tog; render(tog); label.textContent = tog ? 'IMAGEN CON MENSAJE OCULTO (LSB)' : 'IMAGEN ORIGINAL'; }, 2500);
-})();
+// ── PIXEL GRID ANIMATION (removed) ──
 </script>
 
 <script type="text/babel" src="tweaks-panel.jsx"></script>
@@ -1730,5 +1659,8 @@ ReactDOM.createRoot(tweaksRoot).render(<TweaksApp />);
 })();
 </script>
 
+<script>
+  lucide.createIcons();
+</script>
 </body>
 </html>
